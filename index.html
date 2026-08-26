@@ -319,6 +319,9 @@
         
         <div class="playlist-action-bar">
             <span id="plAleatorioBtn" class="p-icon" onclick="alternarAleatorio()" title="Modo Aleatorio">🔀</span>
+            <!-- NUEVO BOTÓN DE DESCARGA -->
+            <span id="plDescargarBtn" class="p-icon" onclick="descargarPlaylistActiva()" title="Descargar Playlist para escuchar sin internet">⬇️</span>
+            
             <div style="flex:1;"></div>
             <button id="plPlayBtn" class="play-blue" onclick="toggleReproducirPlaylistActiva()">▶</button>
         </div>
@@ -1218,7 +1221,6 @@ crossfadeInput.oninput = (e) => {
     localStorage.hgCrossfade = crossfadeSec;
 };
 
-// NUEVA FUNCIÓN: API DE MEDIA SESSION
 function actualizarMediaSession() {
     if ('mediaSession' in navigator && canciones.length > 0) {
         const c = canciones[indice];
@@ -1506,22 +1508,18 @@ function cambiar(n) {
     historial = [indice,...historial.filter(x=>x!==indice)].slice(0,10); 
     guardar(); mostrarBiblioteca(); 
     actualizarEstadoBotonesUI();
-    actualizarMediaSession(); // LLAMADA A LA API AGREGADA AQUÍ
+    actualizarMediaSession(); 
 } 
 
-// LÓGICA DE SIGUIENTE CON ALEATORIO MEJORADA
 function siguiente(){ 
     if(!canciones.length) return; 
 
-    // Si hay una cola pendiente de reproduccion
     if(cola.length > 0) {
         let n;
         if(aleatorio) {
-            // Elige un elemento al azar dentro de la cola
             let rIdx = Math.floor(Math.random() * cola.length);
             n = cola.splice(rIdx, 1)[0];
         } else {
-            // Modo normal secuencial
             n = cola.shift();
         }
         guardar();
@@ -1529,20 +1527,16 @@ function siguiente(){
         return;
     }
 
-    // Si la cola se agotó
     if(aleatorio) {
         if (playlistActual && playlists[playlistActual] && playlists[playlistActual].length > 0) {
-            // Elige una canción al azar de la playlist en uso
             let list = playlists[playlistActual];
             let n = list[Math.floor(Math.random() * list.length)];
             cambiar(n);
         } else {
-            // Elige una canción al azar de todas las canciones
             let n = Math.floor(Math.random() * canciones.length);
             cambiar(n);
         }
     } else {
-        // Avance por defecto en orden correlativo
         cambiar((indice + 1) % canciones.length);
     }
 } 
@@ -1654,6 +1648,7 @@ function abrirDetallePlaylist(nombre) {
     window.scrollTo({top:0,behavior:"smooth"});
 
     $("plNombre").textContent = nombre;
+    revisarSiEstaDescargada(); // <--- Llama a verificar si la playlist está descargada
     
     let songs = playlists[nombre] || [];
     $("plStats").textContent = `${songs.length} canciones`;
@@ -1819,11 +1814,93 @@ function crearHome(){
     }); 
 } 
 
+// ==========================================
+// NUEVAS FUNCIONES: DESCARGAR PLAYLIST
+// ==========================================
+async function descargarPlaylistActiva() {
+    if (!playlistActual || !playlists[playlistActual] || playlists[playlistActual].length === 0) {
+        alert("No hay canciones en esta playlist para descargar.");
+        return;
+    }
+
+    const btn = $("plDescargarBtn");
+    
+    // Si ya está descargada, no hacemos nada
+    if (btn.classList.contains("activo")) {
+        alert("✅ Esta playlist ya está guardada en tu dispositivo.");
+        return;
+    }
+
+    let confirmacion = confirm("¿Quieres descargar todas las canciones de esta playlist para escucharlas sin internet? (Puede tardar unos segundos dependiendo de tu conexión).");
+    if (!confirmacion) return;
+
+    // Cambiar diseño del botón a "Cargando"
+    btn.textContent = "⏳";
+    btn.style.pointerEvents = "none";
+
+    try {
+        // Abrimos la misma memoria (Caché) que usa tu sw.js
+        const cache = await caches.open('hg-music-v3'); 
+        
+        // Buscamos todas las canciones de esta playlist
+        let promesas = playlists[playlistActual].map(async (idx) => {
+            let c = canciones[idx];
+            if (c) {
+                try {
+                    // Guardamos el audio y la portada en la memoria del celular
+                    let resAudio = await fetch(c.archivo);
+                    if(resAudio.ok) await cache.put(c.archivo, resAudio.clone());
+                    
+                    let resPortada = await fetch(c.portada);
+                    if(resPortada.ok) await cache.put(c.portada, resPortada.clone());
+                } catch(e) {
+                    console.log("No se pudo descargar una parte de: " + c.nombre);
+                }
+            }
+        });
+
+        // Esperamos a que se descarguen TODAS
+        await Promise.all(promesas);
+
+        // Guardamos en el historial del celular que esta playlist ya está descargada
+        let descargadas = JSON.parse(localStorage.hgDescargasV2 || "{}");
+        descargadas[playlistActual] = true;
+        localStorage.hgDescargasV2 = JSON.stringify(descargadas);
+
+        // Cambiamos el botón a éxito
+        btn.textContent = "✅";
+        btn.classList.add("activo");
+        btn.style.pointerEvents = "auto";
+        
+        alert("🎉 ¡Descarga completada! Ya puedes apagar tu internet y escuchar tu playlist.");
+    } catch (error) {
+        console.error(error);
+        btn.textContent = "⬇️";
+        btn.style.pointerEvents = "auto";
+        alert("❌ Hubo un error al descargar. Intenta de nuevo con mejor conexión.");
+    }
+}
+
+function revisarSiEstaDescargada() {
+    let descargadas = JSON.parse(localStorage.hgDescargasV2 || "{}");
+    const btn = $("plDescargarBtn");
+    if (btn) {
+        if (descargadas[playlistActual]) {
+            btn.textContent = "✅";
+            btn.classList.add("activo");
+        } else {
+            btn.textContent = "⬇️";
+            btn.classList.remove("activo");
+        }
+    }
+}
+// ==========================================
+
 crearHome(); 
 mostrarBiblioteca(); 
 cargar(0); 
 actualizarEstadoBotonesUI();
-actualizarMediaSession(); // LLAMADA A LA API AGREGADA AQUÍ
+actualizarMediaSession(); 
 
 document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activa")); 
 $("vistaInicio").classList.add("activa"); 
