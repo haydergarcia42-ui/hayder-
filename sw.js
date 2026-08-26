@@ -1,24 +1,40 @@
-const CACHE_NAME = '𝒽ℊ v2';
-const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png'
-];
+const CACHE_NAME = '𝒽ℊ';
 
-// Instala el ayudante y guarda los archivos en caché
+// 1. Instalar y activar inmediatamente (evita que se quede pegada la versión vieja)
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
-  );
+    self.skipWaiting();
 });
 
-// Intercepta las solicitudes para que la app cargue de forma fluida
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.map(cacheName => {
+                    if (cacheName !== CACHE_NAME) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        }).then(() => self.clients.claim())
+    );
+});
+
+// 2. Estrategia "Network First" (Red primero)
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
-  );
+    // Excluimos algunas peticiones raras de navegadores
+    if (event.request.method !== 'GET') return;
+
+    event.respondWith(
+        // Intenta descargar la versión más reciente de internet
+        fetch(event.request).then(response => {
+            // Si hay internet, guarda una copia nueva en la caché
+            return caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, response.clone());
+                return response;
+            });
+        }).catch(() => {
+            // Si NO hay internet (modo offline), usa la versión que guardó antes
+            return caches.match(event.request);
+        })
+    );
 });
