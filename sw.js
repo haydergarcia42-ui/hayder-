@@ -1,6 +1,6 @@
-const CACHE_NAME = '𝒽ℊ';
+const CACHE_NAME = 'hg-music-v3';
 
-// 1. Instalar y activar inmediatamente (evita que se quede pegada la versión vieja)
+// Forzar activación inmediata de nuevas versiones
 self.addEventListener('install', event => {
     self.skipWaiting();
 });
@@ -19,22 +19,39 @@ self.addEventListener('activate', event => {
     );
 });
 
-// 2. Estrategia "Network First" (Red primero)
+// Estrategia blindada para celulares y PC
 self.addEventListener('fetch', event => {
-    // Excluimos algunas peticiones raras de navegadores
-    if (event.request.method !== 'GET') return;
+    const request = event.request;
 
+    // Si es la página principal (HTML), OBLIGATORIAMENTE va a internet primero
+    if (request.mode === 'navigate' || request.destination === 'document') {
+        event.respondWith(
+            fetch(request)
+                .then(networkResponse => {
+                    return caches.open(CACHE_NAME).then(cache => {
+                        cache.put(request, networkResponse.clone());
+                        return networkResponse;
+                    });
+                })
+                .catch(() => {
+                    // Solo si el dispositivo está 100% sin internet, usa la caché
+                    return caches.match(request);
+                })
+        );
+        return;
+    }
+
+    // Para el resto de archivos
     event.respondWith(
-        // Intenta descargar la versión más reciente de internet
-        fetch(event.request).then(response => {
-            // Si hay internet, guarda una copia nueva en la caché
-            return caches.open(CACHE_NAME).then(cache => {
-                cache.put(event.request, response.clone());
-                return response;
-            });
-        }).catch(() => {
-            // Si NO hay internet (modo offline), usa la versión que guardó antes
-            return caches.match(event.request);
-        })
+        fetch(request)
+            .then(response => {
+                return caches.open(CACHE_NAME).then(cache => {
+                    cache.put(request, response.clone());
+                    return response;
+                });
+            })
+            .catch(() => {
+                return caches.match(request);
+            })
     );
 });
