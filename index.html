@@ -6,438 +6,209 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>H.g Music</title>
-<style>
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;scrollbar-width:thin;scrollbar-color:#ffffff22 transparent} 
-    html,body{margin:0;min-height:100%;background:#050505} 
-    body{min-height:100vh;font-family:Arial,sans-serif;color:#fff;overflow-x:hidden;--c:#08f;--c-texto:#008cff;background:radial-gradient(circle at 10% 0,#008cff35,transparent 35%),radial-gradient(circle at 90% 100%,#0028ff35,transparent 35%),linear-gradient(135deg,#050505,#0b0b0b,#050505)} 
-    button,input{font:inherit} 
-    button{user-select:none; cursor:pointer;} 
-    
-    .logo{font-family:"Brush Script MT","Segoe Script",cursive;font-weight:700;font-style:italic;letter-spacing:-2px;background:linear-gradient(120deg,var(--c-texto),#fff,var(--c-texto));background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:logo 7s ease infinite} 
-    .logo-head{font-size:clamp(36px,8vw,50px);margin:0;} 
-    @keyframes logo{50%{background-position:100% 50%}} 
-    
-    #inicioCarga{position:fixed;inset:0;height:100dvh;background:radial-gradient(circle at 15% 15%,#008cff45,transparent 32%),radial-gradient(circle at 85% 85%,#7b2cff35,transparent 32%),linear-gradient(135deg,#030303,#090909,#030303);z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;animation:inicioOcultar .8s cubic-bezier(0.4, 0, 0.2, 1) 2.5s forwards} 
-    @keyframes inicioOcultar{to{opacity:0;visibility:hidden;pointer-events:none;filter:blur(10px);transform:scale(1.1)}} 
-    
-    .texto-bienvenida {
-        font-size: clamp(45px, 12vw, 75px);
-        font-family: "Brush Script MT", "Segoe Script", cursive;
-        font-weight: 700;
-        margin: 0;
-        background: linear-gradient(120deg, #fff, var(--c-texto), #fff);
-        background-size: 200%;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: brilloBienvenida 3s linear infinite, aparecerBienvenida 1.2s cubic-bezier(0.2, 1, 0.2, 1) forwards;
-        opacity: 0;
-        transform: translateY(20px) scale(0.9);
-    }
-    @keyframes aparecerBienvenida { 100% { opacity: 1; transform: translateY(0) scale(1); } }
-    @keyframes brilloBienvenida { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
-    
-    .sub-bienvenida {
-        font-size: 13px; color: #aaa; margin-top: 15px; letter-spacing: 4px; text-transform: uppercase; font-weight: bold;
-        opacity: 0; transform: translateY(10px); animation: aparecerSub 1s ease 0.6s forwards;
-    }
-    @keyframes aparecerSub { to { opacity: 1; transform: translateY(0); } }
-    
-    header{text-align:center;padding:18px 15px 10px;position:relative;display:flex;justify-content:center;align-items:center;} 
-    .ajustes{position:absolute;right:15px;top:50%;transform:translateY(-50%);width:45px;height:45px;border:0;border-radius:50%;background:#ffffff15;color:#fff;font-size:21px;display:flex;align-items:center;justify-content:center;cursor:pointer;} 
-    
-    .menu{position:fixed;top:72px;right:14px;width:min(320px,calc(100vw - 28px));max-height:80vh;overflow-y:auto;padding:18px;background:#10131af7;border:1px solid #ffffff1f;border-radius:22px;backdrop-filter:blur(20px);z-index:9000;opacity:0;visibility:hidden;transform:translateY(-10px) scale(.95);transition:.2s} 
-    .menu.abierto{opacity:1;visibility:visible;transform:none} 
-    .menu h3{text-align:center;margin:0 0 15px} 
-    .seccion{border-top:1px solid #ffffff14;padding-top:13px;margin-top:13px} 
-    .seccion small{color:#999;display:block;margin-bottom:10px} 
-    
-    .colores{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;justify-items:center} 
-    .color{width:36px;height:36px;border-radius:50%;border:3px solid #fff4;cursor:pointer;transition:.2s} 
-    .color:active{transform:scale(0.8)}
-    
-    .azul{background:#08f}.morado{background:#8a2be2}.rosado{background:#ff1493}.amarillo{background:#ffd000}.verde{background:#1ed760}.rojo{background:#ff3030}.celeste{background:#00cfff}.turquesa{background:#00e5c3}.naranja{background:#ff7a00}.fucsia{background:#ff00a8}.lima{background:#a8ff00}.dorado{background:#ffb000}.coral{background:#ff5f5f}.menta{background:#00ff9d}.violeta{background:#b000ff}.indigo{background:#4b3cff}.azulclaro{background:#00aaff}.rosa{background:#ff69b4}.blanco{background:#ffffff}.gris{background:#666666}
-    
-    .busqueda{position:relative;width:min(calc(100% - 28px),650px);margin:8px auto 25px} 
-    .busqueda input{width:100%;padding:16px 50px;border:0;border-radius:18px;background:#fff;color:#111;outline:0;font-size:16px;font-weight:600} 
-    .icono{position:absolute;left:17px;top:13px;font-size:24px;color:#111;z-index:2} 
-    .limpiar{position:absolute;right:12px;top:9px;width:40px;height:40px;border:0;border-radius:50%;background:#0001;font-size:20px;display:none} 
-    .busqueda.buscar-activo .limpiar{display:block} 
-    
-    .vista{display:none;width:min(calc(100% - 28px),650px);margin:auto;padding-bottom:120px} 
-    .vista.activa{display:block} 
-    
-    .saludo{
-        margin: 15px 0 25px;
-        font-size: 42px;
-        font-weight: 700;
-        font-family: "Brush Script MT", "Segoe Script", cursive;
-        background: linear-gradient(120deg, #fff, var(--c-texto), #fff);
-        background-size: 200%;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: deslizarSaludo 4s ease-in-out infinite; 
-        transform-origin: left center;
-        display: inline-block;
-    } 
-    @keyframes deslizarSaludo {
-        0%, 100% { opacity: 1; transform: translateX(0); }
-        50% { opacity: 0; transform: translateX(-45px); }
-    }
-    
-    .seccion-home{margin-bottom:28px} 
-    .seccion-home h2{font-size:21px;margin:0 0 14px} 
-    .tarjetas{display:flex;gap:14px;overflow-x:auto;padding-bottom:5px;scrollbar-width:none} 
-    .tarjetas::-webkit-scrollbar{display:none} 
-    .tarjeta{min-width:145px;width:145px;background:#ffffff0c;border-radius:16px;padding:10px;cursor:pointer;transition:.2s} 
-    .tarjeta:active{transform:scale(.96)} 
-    .tarjeta img{width:125px;height:125px;object-fit:cover;border-radius:12px;display:block} 
-    .tarjeta b,.tarjeta small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} 
-    .tarjeta b{font-size:14px;margin-top:9px} 
-    .tarjeta small{color:#888;font-size:11px;margin-top:5px} 
-    
-    .titulo-resultados{font-size:24px;margin:5px 0 16px} 
-    .resultado{display:flex;align-items:center;gap:12px;padding:9px 5px;border-radius:14px;cursor:pointer;transition:.15s} 
-    .resultado:active{background:#ffffff12;transform:scale(.98)} 
-    .resultado img{width:58px;height:58px;border-radius:8px;object-fit:cover} 
-    .resultado-info{flex:1;min-width:0} 
-    .resultado-info b,.resultado-info small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} 
-    .resultado-info b{font-size:16px} 
-    .resultado-info small{color:#999;margin-top:5px} 
-    .resultado-play{width:40px;height:40px;border:0;border-radius:50%;background:#ffffff10;color:#fff;font-size:18px} 
-    .sin-resultados{text-align:center;padding:45px 15px;color:#888} 
-    .sin-resultados strong{display:block;font-size:18px;color:#fff;margin-bottom:7px} 
-    
-    #vistaReproductor{width:min(calc(100% - 28px),560px)} 
-    .volver{border:0;background:none;color:#fff;width:42px;height:42px;border-radius:50%;font-size:24px;margin-bottom:15px; text-align:left; padding:0;} 
-    .musica{width:100%;margin:0 auto 25px;padding:20px;background:linear-gradient(145deg,#151515,#090909);border:1px solid #ffffff18;border-radius:28px;box-shadow:0 20px 60px #000b;position:relative;overflow:hidden} 
-    .superior{display:flex;align-items:center;gap:15px} 
-    
-    .portada{width:110px;height:110px;min-width:110px;border-radius:18px;overflow:hidden;background:#181818;transition:.8s; cursor:pointer;} 
-    .portada img{width:100%;height:100%;object-fit:cover} 
-    .reproduciendo .portada:not(.sin-giro){animation:girar 8s linear infinite;box-shadow:0 0 25px var(--c),0 0 45px var(--c)} 
-    .portada.sin-giro{animation:none !important; box-shadow:0 0 15px rgba(255,255,255,0.15);}
-    @keyframes girar{to{transform:rotate(360deg)}} 
-    
-    .datos{flex:1;min-width:0} 
-    .titulo{margin:0;font-size:clamp(19px,5vw,24px);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} 
-    .artista{margin-top:7px;color:#999;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} 
-    .estado{margin-top:7px;font-size:11px;color:#777} 
-    .barra{height:7px;margin-top:22px;background:#ffffff25;border-radius:20px;overflow:hidden;cursor:pointer;touch-action:none} 
-    .progreso{width:0;height:100%;background:var(--c);box-shadow:0 0 10px var(--c),0 0 20px var(--c)} 
-    .tiempo{display:flex;justify-content:space-between;margin-top:7px;color:#888;font-size:11px} 
-    
-    .controles{display:flex;justify-content:center;align-items:center;gap:35px;margin-top:17px} 
-    .boton{border:0;display:flex;align-items:center;justify-content:center; width:54px;height:54px;border-radius:50%;background:#ffffff12;color:#fff;font-size:23px;} 
-    
-    .play-blue { 
-        width:58px; height:58px; border-radius:50%; 
-        background:var(--c); color:#fff; 
-        display:flex; align-items:center; justify-content:center; 
-        border:none; cursor:pointer; 
-        box-shadow:0 8px 20px rgba(0, 140, 255, 0.4); transition:0.2s; 
-    }
-    .play-blue svg { width:26px; height:26px; margin-left:3px; } 
-    .play-blue.reproduciendo svg { margin-left:0; width:24px; height:24px; } 
-
-    .extra-controles{display:flex;justify-content:center;gap:7px;margin-top:14px;flex-wrap:wrap} 
-    .extra{border:0;padding:8px 11px;border-radius:12px;background:#ffffff12;color:#fff;font-size:11px; transition:0.2s;} 
-    .extra.activo{background:var(--c);color:#000; font-weight:bold; box-shadow:0 0 12px var(--c);} 
-    
-    .mini-player{
-        position:fixed;left:10px;right:10px;bottom:72px;z-index:4000;
-        display:flex;align-items:center;gap:10px;padding:9px 12px;
-        background:#111e;border:1px solid #fff2;border-radius:18px;
-        backdrop-filter:blur(18px);box-shadow:0 8px 30px #0008;cursor:pointer;
-        opacity:0; visibility:hidden; transform:translateY(20px);
-        transition: 0.3s cubic-bezier(0.2, 1, 0.2, 1);
-    } 
-    .mini-player.visible{
-        opacity:1; visibility:visible; transform:translateY(0);
-    } 
-    .mini-player img{width:45px;height:45px;border-radius:10px;object-fit:cover} 
-    .mini-info{flex:1;min-width:0} 
-    .mini-info b,.mini-info small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} 
-    .mini-info small{color:#888;margin-top:3px} 
-    .mini-play{border:0;background:var(--c);color:#fff;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;} 
-    .mini-play svg{width:20px;height:20px;margin-left:2px;}
-    
-    .panel{margin-bottom:22px} 
-    .panel h2{font-size:20px;margin:0 0 13px} 
-    .vacio{padding:18px;border-radius:16px;background:#ffffff0d;color:#888;text-align:center} 
-    .cancion{width:100%;min-height:76px;display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:10px;background:#ffffff0e;border:1px solid #ffffff0d;border-radius:17px;cursor:pointer} 
-    .cancion.actual{border-color:var(--c);background:#ffffff1a} 
-    .mini{width:60px;height:60px;min-width:60px;border-radius:12px;overflow:hidden} 
-    .mini img{width:100%;height:100%;object-fit:cover} 
-    .info{flex:1;min-width:0;text-align:left} 
-    .nombre{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} 
-    .artista-lista{margin-top:5px;color:#888;font-size:12px} 
-    
-    .add-btn{border:0;background:none;color:#aaa;font-size:20px;padding:5px;margin-right:2px}
-    .fav{border:0;background:none;color:#aaa;font-size:21px;padding:5px} 
-    .fav.activo{color:#1ed760} 
-    
-    .navegacion{position:fixed;left:0;right:0;bottom:0;height:64px;z-index:4500;background:#080808f5;border-top:1px solid #ffffff12;backdrop-filter:blur(20px);display:flex;justify-content:space-evenly;align-items:center} 
-    .nav-btn{border:0;background:none;color:#777;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;min-width:65px} 
-    .nav-btn span{font-size:23px} 
-    .nav-btn.activo{color:#fff} 
-    
-    .playlist-header-top { display:flex; align-items:center; gap:10px; margin-bottom:15px; }
-    .playlist-header-top input { flex:1; padding:12px 15px; border-radius:12px; border:none; background:#ffffff1a; color:#fff; font-size:14px; outline:none; }
-    .playlist-collage { width:220px; height:220px; margin:0 auto 15px; box-shadow:0 10px 40px #0008; background:#282828; }
-    .collage-4 { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; height:100%; }
-    .collage-1 { display:block; height:100%; width:100%; }
-    .collage-4 img, .collage-1 img { width:100%; height:100%; object-fit:cover; }
-    
-    .playlist-action-bar { display:flex; align-items:center; gap:15px; margin:20px 0; }
-    
-    .p-icon { 
-        display:inline-flex; align-items:center; justify-content:center; 
-        width:48px; height:48px; border-radius:50%; 
-        background:rgba(255,255,255,0.08); color:#ccc; 
-        cursor:pointer; transition:0.2s; border:none;
-    }
-    .p-icon svg { width:22px; height:22px; }
-    .p-icon:hover { color:#fff; background:rgba(255,255,255,0.15); }
-    .p-icon.activo { color:#000; background:var(--c); box-shadow:0 0 15px var(--c); font-weight:bold; }
-
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-    .spin-anim { animation: spin 1s linear infinite; }
-    
-    .modal{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;padding:20px;background:#000a;backdrop-filter:blur(8px);z-index:8000;opacity:0;visibility:hidden;transition:.2s} 
-    .modal.abierto{opacity:1;visibility:visible} 
-    .modal-caja{width:min(430px,100%);max-height:85vh;overflow-y:auto;padding:22px;border-radius:22px;background:#141414;border:1px solid #fff2} 
-    .modal-caja h3{margin-top:0} 
-    .modal-opciones{display:grid;gap:9px} 
-    .cerrar{width:100%;margin-top:15px;background:var(--c);color:#000;font-weight:bold;text-align:center;border:0;border-radius:13px;padding:13px} 
-    .cola-opcion{display:flex;align-items:center;gap:10px;padding:9px;border-radius:13px;background:#ffffff0d;margin-bottom:7px} 
-    .cola-opcion img{width:48px;height:48px;border-radius:10px;object-fit:cover} 
-    .cola-opcion-info{flex:1;min-width:0} 
-    .cola-opcion-info b,.cola-opcion-info small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} 
-    .cola-opcion-info small{color:#888;margin-top:4px} 
-    .boton-agregar{border:0;background:#1ed760;color:#000;font-weight:bold;border-radius:10px;padding:9px 11px} 
-</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;scrollbar-width:thin;scrollbar-color:#ffffff2a transparent}html,body{margin:0;min-height:100%;background:#08090c}body{min-height:100vh;font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#f4f5f7;overflow-x:hidden;--c:#0a8bff;--c-texto:#0a8bff;--bg-1:#08090c;--bg-2:#0e1015;--card:#ffffff0a;--card-border:#ffffff14;--muted:#8c8f9b;--muted-2:#6a6d78;background:radial-gradient(circle at 8% -5%,color-mix(in srgb,var(--c) 22%,transparent),transparent 40%),radial-gradient(circle at 95% 105%,#5b2cff2e,transparent 42%),linear-gradient(160deg,#08090c,#0c0d11 45%,#08090c);background-attachment:fixed;letter-spacing:-0.01em}button,input{font:inherit}button{user-select:none;cursor:pointer;-webkit-tap-highlight-color:transparent}::selection{background:color-mix(in srgb,var(--c) 45%,transparent);color:#fff}.logo{font-family:"Brush Script MT","Segoe Script",cursive;font-weight:700;font-style:italic;letter-spacing:-1px;background:linear-gradient(120deg,var(--c-texto),#fff 45%,var(--c-texto));background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:logo 7s ease infinite;filter:drop-shadow(0 2px 18px color-mix(in srgb,var(--c-texto) 35%,transparent))}.logo-head{font-size:clamp(32px,7.5vw,46px);margin:0}@keyframes logo{50%{background-position:100% 50%}}#inicioCarga{position:fixed;inset:0;height:100dvh;background:radial-gradient(circle at 15% 15%,#008cff40,transparent 34%),radial-gradient(circle at 85% 85%,#7b2cff38,transparent 34%),linear-gradient(160deg,#050608,#0a0b0e,#050608);z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;animation:inicioOcultar .8s cubic-bezier(0.4,0,0.2,1) 2.5s forwards}@keyframes inicioOcultar{to{opacity:0;visibility:hidden;pointer-events:none;filter:blur(10px);transform:scale(1.08)}}.texto-bienvenida{font-size:clamp(42px,11vw,70px);font-family:"Brush Script MT","Segoe Script",cursive;font-weight:700;margin:0;background:linear-gradient(120deg,#fff,var(--c-texto),#fff);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:brilloBienvenida 3s linear infinite,aparecerBienvenida 1.2s cubic-bezier(0.2,1,0.2,1) forwards;opacity:0;transform:translateY(20px) scale(0.9)}@keyframes aparecerBienvenida{100%{opacity:1;transform:translateY(0) scale(1)}}@keyframes brilloBienvenida{0%{background-position:0% center}100%{background-position:200% center}}.sub-bienvenida{font-size:12px;color:var(--muted);margin-top:16px;letter-spacing:5px;text-transform:uppercase;font-weight:600;opacity:0;transform:translateY(10px);animation:aparecerSub 1s ease 0.6s forwards}@keyframes aparecerSub{to{opacity:1;transform:translateY(0)}}header{text-align:center;padding:22px 15px 12px;position:relative;display:flex;justify-content:center;align-items:center}.ajustes{position:absolute;right:15px;top:50%;transform:translateY(-50%);width:44px;height:44px;border:1px solid var(--card-border);border-radius:50%;background:var(--card);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}.ajustes:active{transform:translateY(-50%) scale(.9);background:#ffffff16}.menu{position:fixed;top:74px;right:14px;width:min(320px,calc(100vw - 28px));max-height:80vh;overflow-y:auto;padding:20px;background:#12131af5;border:1px solid #ffffff1a;border-radius:24px;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:0 25px 60px #000a;z-index:9000;opacity:0;visibility:hidden;transform:translateY(-10px) scale(.95);transition:.22s cubic-bezier(0.2,1,0.2,1)}.menu.abierto{opacity:1;visibility:visible;transform:none}.menu h3{text-align:center;margin:0 0 16px;font-size:15px;letter-spacing:.02em;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}.seccion{border-top:1px solid #ffffff12;padding-top:14px;margin-top:14px}.seccion small{color:var(--muted);display:block;margin-bottom:11px;font-size:12px;display:flex;align-items:center;gap:7px}.colores{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;justify-items:center}.color{width:34px;height:34px;border-radius:50%;border:2px solid #ffffff30;cursor:pointer;transition:.18s;box-shadow:0 3px 8px #0006}.color:active{transform:scale(0.82)}.color:hover{border-color:#fff8;transform:translateY(-2px)}.azul{background:#08f}.morado{background:#8a2be2}.rosado{background:#ff1493}.amarillo{background:#ffd000}.verde{background:#1ed760}.rojo{background:#ff3030}.celeste{background:#00cfff}.turquesa{background:#00e5c3}.naranja{background:#ff7a00}.fucsia{background:#ff00a8}.lima{background:#a8ff00}.dorado{background:#ffb000}.coral{background:#ff5f5f}.menta{background:#00ff9d}.violeta{background:#b000ff}.indigo{background:#4b3cff}.azulclaro{background:#00aaff}.rosa{background:#ff69b4}.blanco{background:#ffffff}.gris{background:#666666}.busqueda{position:relative;width:min(calc(100% - 28px),650px);margin:8px auto 25px}.busqueda input{width:100%;padding:16px 50px;border:1px solid transparent;border-radius:18px;background:#f3f4f6;color:#111;outline:0;font-size:15px;font-weight:600;transition:.2s}.busqueda input:focus{background:#fff;box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 35%,transparent)}.icono{position:absolute;left:17px;top:14px;font-size:21px;color:#555;z-index:2;display:flex}.icono svg{width:20px;height:20px}.limpiar{position:absolute;right:12px;top:9px;width:40px;height:40px;border:0;border-radius:50%;background:#0001;font-size:18px;display:none;color:#222}.busqueda.buscar-activo .limpiar{display:block}.vista{display:none;width:min(calc(100% - 28px),650px);margin:auto;padding-bottom:130px}.vista.activa{display:block;animation:vistaAparecer .35s cubic-bezier(0.2,1,0.2,1)}@keyframes vistaAparecer{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}.saludo{margin:14px 0 26px;font-size:40px;font-weight:700;font-family:"Brush Script MT","Segoe Script",cursive;background:linear-gradient(120deg,#fff,var(--c-texto),#fff);background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:deslizarSaludo 4s ease-in-out infinite;transform-origin:left center;display:inline-block}@keyframes deslizarSaludo{0%,100%{opacity:1;transform:translateX(0)}50%{opacity:0;transform:translateX(-45px)}}.seccion-home{margin-bottom:30px}.seccion-home h2{font-size:19px;margin:0 0 14px;font-weight:700;letter-spacing:-.01em}.tarjetas{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}.tarjetas::-webkit-scrollbar{display:none}.tarjeta{min-width:145px;width:145px;background:var(--card);border:1px solid var(--card-border);border-radius:18px;padding:11px;cursor:pointer;transition:.2s}.tarjeta:active{transform:scale(.96);background:#ffffff14}.tarjeta img{width:123px;height:123px;object-fit:cover;border-radius:13px;display:block;box-shadow:0 8px 18px #0006}.tarjeta b,.tarjeta small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tarjeta b{font-size:13.5px;margin-top:10px;font-weight:600}.tarjeta small{color:var(--muted);font-size:11px;margin-top:4px}.titulo-resultados{font-size:22px;margin:6px 0 16px;font-weight:700;letter-spacing:-.01em}.resultado{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:14px;cursor:pointer;transition:.15s}.resultado:active{background:#ffffff14;transform:scale(.98)}.resultado img{width:56px;height:56px;border-radius:10px;object-fit:cover;box-shadow:0 4px 10px #0006}.resultado-info{flex:1;min-width:0}.resultado-info b,.resultado-info small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.resultado-info b{font-size:15px;font-weight:600}.resultado-info small{color:var(--muted);margin-top:4px;font-size:12.5px}.resultado-play{width:38px;height:38px;border:0;border-radius:50%;background:var(--card);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center}.resultado-play svg{width:16px;height:16px}.sin-resultados{text-align:center;padding:50px 15px;color:var(--muted)}.sin-resultados strong{display:flex;align-items:center;justify-content:center;gap:8px;font-size:17px;color:#fff;margin-bottom:7px;font-weight:700}#vistaReproductor{width:min(calc(100% - 28px),560px)}.volver{border:1px solid var(--card-border);background:var(--card);color:#fff;width:42px;height:42px;border-radius:50%;font-size:20px;margin-bottom:16px;text-align:center;padding:0;display:flex;align-items:center;justify-content:center;transition:.2s}.volver:active{transform:scale(.9)}.musica{width:100%;margin:0 auto 25px;padding:22px;background:linear-gradient(155deg,#16171d,#0a0a0d);border:1px solid #ffffff14;border-radius:30px;box-shadow:0 25px 70px #000c,inset 0 1px 0 #ffffff0f;position:relative;overflow:hidden}.musica::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 20% 0%,color-mix(in srgb,var(--c) 12%,transparent),transparent 55%)}.superior{display:flex;align-items:center;gap:16px;position:relative}.portada{width:108px;height:108px;min-width:108px;border-radius:20px;overflow:hidden;background:#181818;transition:.8s;cursor:pointer}.portada img{width:100%;height:100%;object-fit:cover}.reproduciendo .portada:not(.sin-giro){animation:girar 8s linear infinite;box-shadow:0 0 25px var(--c),0 0 45px color-mix(in srgb,var(--c) 55%,transparent)}.portada.sin-giro{animation:none!important;box-shadow:0 0 15px rgba(255,255,255,0.15)}@keyframes girar{to{transform:rotate(360deg)}}.datos{flex:1;min-width:0}.titulo{margin:0;font-size:clamp(18px,4.8vw,23px);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}.artista{margin-top:6px;color:var(--muted);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.estado{margin-top:8px;font-size:11px;color:var(--muted-2);letter-spacing:.02em}.barra{height:6px;margin-top:24px;background:#ffffff1f;border-radius:20px;overflow:hidden;cursor:pointer;touch-action:none;position:relative}.progreso{width:0;height:100%;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 70%,#fff),var(--c));box-shadow:0 0 10px var(--c),0 0 20px var(--c)}.tiempo{display:flex;justify-content:space-between;margin-top:8px;color:var(--muted-2);font-size:11px;font-variant-numeric:tabular-nums}.controles{display:flex;justify-content:center;align-items:center;gap:32px;margin-top:22px}.boton{border:0;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:var(--card);color:#fff;font-size:21px;transition:.15s;border:1px solid var(--card-border)}.boton svg{width:20px;height:20px}.boton:active{transform:scale(.88);background:#ffffff1c}.play-blue{width:60px;height:60px;border-radius:50%;background:linear-gradient(155deg,color-mix(in srgb,var(--c) 85%,#fff),var(--c));color:#fff;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;box-shadow:0 10px 26px color-mix(in srgb,var(--c) 55%,transparent);transition:0.2s}.play-blue:active{transform:scale(.92)}.play-blue svg{width:25px;height:25px;margin-left:3px}.play-blue.reproduciendo svg{margin-left:0;width:23px;height:23px}.extra-controles{display:flex;justify-content:center;gap:8px;margin-top:18px;flex-wrap:wrap}.extra{border:1px solid var(--card-border);padding:9px 13px;border-radius:13px;background:var(--card);color:#e6e7ea;font-size:11.5px;font-weight:600;transition:0.2s;display:flex;align-items:center;gap:6px}.extra svg{width:14px;height:14px}.extra:active{transform:scale(.94)}.extra.activo{background:var(--c);color:#000;font-weight:700;box-shadow:0 0 14px color-mix(in srgb,var(--c) 60%,transparent);border-color:transparent}.mini-player{position:fixed;left:10px;right:10px;bottom:76px;z-index:4000;display:flex;align-items:center;gap:11px;padding:10px 13px;background:#121319ee;border:1px solid #ffffff1c;border-radius:20px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 12px 34px #000a;cursor:pointer;opacity:0;visibility:hidden;transform:translateY(20px);transition:0.3s cubic-bezier(0.2,1,0.2,1)}.mini-player.visible{opacity:1;visibility:visible;transform:translateY(0)}.mini-player img{width:44px;height:44px;border-radius:11px;object-fit:cover;box-shadow:0 4px 10px #0007}.mini-info{flex:1;min-width:0}.mini-info b,.mini-info small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini-info b{font-size:13.5px;font-weight:600}.mini-info small{color:var(--muted);margin-top:2px;font-size:11.5px}.mini-play{border:0;background:var(--c);color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px color-mix(in srgb,var(--c) 50%,transparent)}.mini-play svg{width:19px;height:19px;margin-left:2px}.panel{margin-bottom:26px}.panel h2{font-size:18px;margin:0 0 14px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}.panel h2 svg{width:18px;height:18px}.vacio{padding:20px;border-radius:16px;background:var(--card);border:1px solid var(--card-border);color:var(--muted);text-align:center;font-size:13.5px}.cancion{width:100%;min-height:74px;display:flex;align-items:center;gap:11px;padding:10px 12px;margin-bottom:9px;background:var(--card);border:1px solid var(--card-border);border-radius:17px;cursor:pointer;transition:.15s}.cancion:active{background:#ffffff14;transform:scale(.99)}.cancion.actual{border-color:var(--c);background:color-mix(in srgb,var(--c) 12%,#ffffff10)}.mini{width:58px;height:58px;min-width:58px;border-radius:12px;overflow:hidden;box-shadow:0 4px 10px #0006}.mini img{width:100%;height:100%;object-fit:cover}.info{flex:1;min-width:0;text-align:left}.nombre{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.artista-lista{margin-top:4px;color:var(--muted);font-size:12px}.add-btn{border:0;background:none;color:var(--muted);font-size:19px;padding:5px;margin-right:2px;transition:.15s;display:flex;align-items:center}.add-btn svg{width:18px;height:18px}.add-btn:active{transform:scale(.85)}.fav{border:0;background:none;color:var(--muted);font-size:20px;padding:5px;transition:.15s}.fav:active{transform:scale(.8)}.fav.activo{color:#1ed760}.navegacion{position:fixed;left:0;right:0;bottom:0;height:66px;z-index:4500;background:#0a0b0ef7;border-top:1px solid #ffffff14;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);display:flex;justify-content:space-evenly;align-items:center;box-shadow:0 -12px 30px #0006}.nav-btn{border:0;background:none;color:var(--muted-2);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10.5px;min-width:65px;font-weight:600;transition:.2s}.nav-btn span{font-size:22px;transition:.2s;display:flex}.nav-btn span svg{width:22px;height:22px}.nav-btn.activo{color:#fff}.nav-btn.activo span{color:var(--c);filter:drop-shadow(0 0 8px color-mix(in srgb,var(--c) 60%,transparent))}.nav-btn:active{transform:scale(.9)}.playlist-header-top{display:flex;align-items:center;gap:10px;margin-bottom:16px}.playlist-header-top input{flex:1;padding:13px 16px;border-radius:13px;border:1px solid var(--card-border);background:var(--card);color:#fff;font-size:14px;outline:none;transition:.2s}.playlist-header-top input:focus{border-color:color-mix(in srgb,var(--c) 55%,transparent);background:#ffffff12}.playlist-collage{width:210px;height:210px;margin:0 auto 16px;border-radius:16px;overflow:hidden;box-shadow:0 18px 50px #000a;background:#1a1b20}.collage-4{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;height:100%}.collage-1{display:block;height:100%;width:100%}.collage-4 img,.collage-1 img{width:100%;height:100%;object-fit:cover}.playlist-action-bar{display:flex;align-items:center;gap:15px;margin:22px 0}.p-icon{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:var(--card);border:1px solid var(--card-border);color:#c9cad0;cursor:pointer;transition:0.2s}.p-icon svg{width:21px;height:21px}.p-icon:hover{color:#fff;background:#ffffff1c}.p-icon:active{transform:scale(.9)}.p-icon.activo{color:#000;background:var(--c);border-color:transparent;box-shadow:0 0 16px color-mix(in srgb,var(--c) 55%,transparent);font-weight:bold}@keyframes spin{100%{transform:rotate(360deg)}}.spin-anim{animation:spin 1s linear infinite}.modal{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;padding:20px;background:#000000b0;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:8000;opacity:0;visibility:hidden;transition:.22s}.modal.abierto{opacity:1;visibility:visible}.modal-caja{width:min(430px,100%);max-height:85vh;overflow-y:auto;padding:24px;border-radius:24px;background:#151620;border:1px solid #ffffff1c;box-shadow:0 30px 80px #000d}.modal-caja h3{margin-top:0;font-size:17px;font-weight:700;letter-spacing:-.01em}.modal-opciones{display:grid;gap:9px}.cerrar{width:100%;margin-top:16px;background:var(--c);color:#000;font-weight:700;text-align:center;border:0;border-radius:14px;padding:14px;transition:.15s}.cerrar:active{transform:scale(.97)}.cola-opcion{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;background:#ffffff0d;margin-bottom:7px;border:1px solid #ffffff0f}.cola-opcion img{width:46px;height:46px;border-radius:10px;object-fit:cover}.cola-opcion-info{flex:1;min-width:0}.cola-opcion-info b,.cola-opcion-info small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cola-opcion-info small{color:var(--muted);margin-top:4px}.boton-agregar{border:0;background:#1ed760;color:#000;font-weight:700;border-radius:11px;padding:9px 12px;display:flex;align-items:center}.boton-agregar svg{width:16px;height:16px}.ambient-hero{position:relative;height:min(58vh,420px);margin:10px 0 20px;border-radius:32px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(160deg,#101117,#0a0a0e);border:1px solid #ffffff12;box-shadow:inset 0 1px 0 #ffffff0f,0 25px 60px #0008}.aurora{position:absolute;border-radius:50%;filter:blur(60px);opacity:.55;will-change:transform,border-radius}.aurora-1{width:70%;height:70%;left:-15%;top:-20%;background:radial-gradient(circle at 35% 35%,var(--c),transparent 70%);animation:auroraFloat1 22s ease-in-out infinite;transition:background 1.2s ease}.aurora-2{width:65%;height:65%;right:-18%;top:0%;background:radial-gradient(circle at 60% 40%,color-mix(in srgb,var(--c) 75%,#9a5cff 25%),transparent 70%);animation:auroraFloat2 27s ease-in-out infinite;transition:background 1.2s ease}.aurora-3{width:55%;height:55%;left:12%;bottom:-24%;background:radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--c) 60%,#000000 20%),transparent 70%);animation:auroraFloat3 32s ease-in-out infinite;transition:background 1.2s ease}@keyframes auroraFloat1{0%,100%{transform:translate(0,0) scale(1);border-radius:50%}50%{transform:translate(8%,10%) scale(1.15);border-radius:42% 58% 63% 37%/48% 42% 58% 52%}}@keyframes auroraFloat2{0%,100%{transform:translate(0,0) scale(1);border-radius:50%}50%{transform:translate(-10%,6%) scale(1.1);border-radius:55% 45% 40% 60%/55% 60% 40% 45%}}@keyframes auroraFloat3{0%,100%{transform:translate(0,0) scale(1);border-radius:50%}50%{transform:translate(6%,-10%) scale(1.2);border-radius:60% 40% 55% 45%/40% 55% 45% 60%}}.aurora-4{width:50%;height:50%;right:8%;bottom:-18%;background:radial-gradient(circle at 45% 55%,color-mix(in srgb,var(--c) 80%,#ffffff 20%),transparent 70%);animation:auroraFloat4 28s ease-in-out infinite;transition:background 1.2s ease}@keyframes auroraFloat4{0%,100%{transform:translate(0,0) scale(1);border-radius:50%}50%{transform:translate(-8%,-8%) scale(1.12);border-radius:48% 52% 45% 55%/55% 45% 58% 42%}}.aurora-vein{position:absolute;inset:-25%;z-index:1;background:linear-gradient(115deg,transparent 0%,color-mix(in srgb,var(--c) 65%,transparent) 14%,transparent 28%,color-mix(in srgb,var(--c) 45%,#ffffff 15%) 42%,transparent 56%,color-mix(in srgb,var(--c) 55%,transparent) 70%,transparent 86%);background-size:280% 280%;filter:blur(45px);opacity:.5;mix-blend-mode:screen;transition:background 1.2s ease;animation:veinFluir 16s ease-in-out infinite}@keyframes veinFluir{0%,100%{background-position:0% 40%}50%{background-position:100% 60%}}.ambient-caption{position:relative;z-index:2;margin:0;font-size:17px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;font-family:"Inter",-apple-system,sans-serif;background:linear-gradient(100deg,var(--muted-2) 10%,#fff 45%,color-mix(in srgb,var(--c) 70%,#fff) 55%,var(--muted-2) 90%);background-size:250% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;opacity:0;transform:translateY(10px);animation:captionAparecer 1.3s cubic-bezier(0.2,1,0.2,1) .3s forwards,captionBrillo 6s ease-in-out .3s infinite}@keyframes captionAparecer{to{opacity:1;transform:translateY(0)}}@keyframes captionBrillo{0%,100%{background-position:0% center}50%{background-position:100% center}}@media(prefers-reduced-motion:reduce){.aurora,.aurora-vein,.ambient-caption{animation:none!important;opacity:1;transform:none}}</style>
 </head>
 <body>
-    <audio id="audio"></audio>
-    <audio id="audioSec"></audio>
-
-    <div id="inicioCarga">
-        <h1 class="texto-bienvenida">Bienvenido</h1>
-        <div class="sub-bienvenida">H.g Music</div>
-    </div>
-
-    <header>
-        <h1 class="logo logo-head">H.g Music</h1>
-        <button id="ajustesBtn" class="ajustes">⚙️</button>
-    </header>
-
-    <div id="menu" class="menu">
-        <h3>🎨 Personalizar</h3>
-        <div class="seccion">
-            <small>Color principal</small>
-            <div class="colores">
-                <button class="color azul" data-c="#008cff"></button>
-                <button class="color verde" data-c="#1ed760"></button>
-                <button class="color rojo" data-c="#ff3030"></button>
-                <button class="color morado" data-c="#8a2be2"></button>
-                <button class="color rosado" data-c="#ff1493"></button>
-                <button class="color amarillo" data-c="#ffd000"></button>
-                <button class="color celeste" data-c="#00cfff"></button>
-                <button class="color naranja" data-c="#ff7a00"></button>
-                <button class="color turquesa" data-c="#00e5c3"></button>
-                <button class="color fucsia" data-c="#ff00a8"></button>
-                <button class="color lima" data-c="#a8ff00"></button>
-                <button class="color dorado" data-c="#ffb000"></button>
-                <button class="color coral" data-c="#ff5f5f"></button>
-                <button class="color menta" data-c="#00ff9d"></button>
-                <button class="color violeta" data-c="#b000ff"></button>
-                <button class="color indigo" data-c="#4b3cff"></button>
-                <button class="color azulclaro" data-c="#00aaff"></button>
-                <button class="color rosa" data-c="#ff69b4"></button>
-                <button class="color blanco" data-c="#ffffff"></button>
-                <button class="color gris" data-c="#666666"></button>
-            </div>
-        </div>
-        <div class="seccion">
-            <small>🔊 Volumen</small>
-            <input type="range" id="volumen" min="0" max="1" step="0.01" value="1" style="width:100%; accent-color:var(--c); cursor:pointer;">
-        </div>
-        <div class="seccion">
-            <div style="font-weight:bold; font-size:14px; margin-bottom:4px;">Crossfade</div>
-            <small style="margin-bottom:8px; display:block; line-height:1.3; color:#aaa;">Ajusta la duración de la finalización gradual y la superposición entre canciones.</small>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; font-size:12px; color:#aaa;">
-                <span id="crossfadeLabel">0 s</span>
-                <span>12 s</span>
-            </div>
-            <input type="range" id="crossfade" min="0" max="12" step="1" value="0" style="width:100%; accent-color:var(--c); cursor:pointer;">
-        </div>
-    </div>
-
-    <!-- VISTA 1: INICIO -->
-    <div id="vistaInicio" class="vista activa">
-        <h1 class="saludo">Bienvenido 👋</h1>
-        
-        <div class="seccion-home">
-            <h2>🔥 Para ti</h2>
-            <div id="recomendados" class="tarjetas"></div>
-        </div>
-        <div class="seccion-home">
-            <h2>🎧 Populares</h2>
-            <div id="populares" class="tarjetas"></div>
-        </div>
-    </div>
-
-    <!-- VISTA 2: BUSCAR -->
-    <div id="vistaBuscar" class="vista">
-        <div id="busqueda" class="busqueda">
-            <span class="icono">🔎</span>
-            <input type="text" id="buscar" placeholder="Escribe el nombre de una canción o artista.">
-            <button id="limpiar" class="limpiar">✕</button>
-        </div>
-        <h2 id="tituloResultados" class="titulo-resultados">Buscar</h2>
-        <div id="resultados">
-            <div class="sin-resultados"><strong>🔎 Busca una canción</strong>Escribe el nombre de una canción o artista.</div>
-        </div>
-    </div>
-
-    <!-- VISTA 3: TU BIBLIOTECA -->
-    <div id="vistaBiblioteca" class="vista">
-        <div class="panel">
-            <h2>📁 Mis Playlists</h2>
-            <div id="listaPlaylistsBiblioteca"></div>
-        </div>
-        <div class="panel">
-            <h2>❤️ Favoritos</h2>
-            <div id="favoritos"></div>
-        </div>
-        <div class="panel">
-            <h2>🕘 Historial</h2>
-            <div id="historial"></div>
-        </div>
-    </div>
-
-    <!-- VISTA DETALLE DE PLAYLIST -->
-    <div id="vistaDetallePlaylist" class="vista">
-        <div class="playlist-header-top">
-            <button class="volver" onclick="volverAnterior()">←</button>
-            <input type="text" id="inputBuscarPlaylist" placeholder="Buscar en la playlist" oninput="filtrarCancionesPlaylist()">
-        </div>
-        
-        <div style="text-align:center; margin-top:10px;">
-            <div id="plCollage" class="playlist-collage"></div>
-        </div>
-        
-        <h1 id="plNombre" style="margin:10px 0 5px; font-size:34px; font-weight:900;">Nombre Playlist</h1>
-        
-        <div id="plStats" style="color:#aaa; font-size:13px; margin-bottom:15px; font-weight:500;">
-            0 canciones
-        </div>
-        
-        <div class="playlist-action-bar">
-            <!-- BOTÓN ALEATORIO -->
-            <button id="plAleatorioBtn" class="p-icon" onclick="alternarAleatorio()" title="Modo Aleatorio">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
-            </button>
-            
-            <!-- BOTÓN DESCARGAR INTELIGENTE -->
-            <button id="plDescargarBtn" class="p-icon" onclick="descargarPlaylistActiva()" title="Descargar Playlist">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            </button>
-            
-            <div style="flex:1;"></div>
-            
-            <!-- BOTÓN PLAY PRINCIPAL -->
-            <button id="plPlayBtn" class="play-blue" onclick="toggleReproducirPlaylistActiva()">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            </button>
-        </div>
-        
-        <div id="plCanciones"></div>
-    </div>
-
-    <!-- VISTA 4: REPRODUCTOR -->
-    <div id="vistaReproductor" class="vista">
-        <button class="volver" onclick="volverAnterior()">←</button>
-        <div id="reproductor" class="musica">
-            <div class="superior">
-                <div id="contenedorPortada" class="portada" onclick="alternarGiroPortada()" title="Toca para pausar/activar el giro de la portada"><img id="portada" src=""></div>
-                <div class="datos">
-                    <h3 id="titulo" class="titulo">Sin canciones</h3>
-                    <div id="artista" class="artista">Agrega tus canciones</div>
-                    <div id="estado" class="estado">Listo para reproducir</div>
-                </div>
-            </div>
-            <div id="barra" class="barra"><div id="progreso" class="progreso"></div></div>
-            <div class="tiempo"><span id="actual">0:00</span><span id="duracion">0:00</span></div>
-            
-            <div class="controles">
-                <button class="boton" onclick="anterior()">⏮</button>
-                <button id="play" class="play-blue" onclick="reproducir()">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <button class="boton" onclick="siguiente()">⏭</button>
-            </div>
-            
-            <div class="extra-controles">
-                <button id="aleatorio" class="extra" onclick="alternarAleatorio()">🔀 Aleatorio</button>
-                <button id="repetir" class="extra" onclick="alternarRepetir()">🔁 Repetir</button>
-                <button id="girarPortadaBtn" class="extra activo" onclick="alternarGiroPortada()">🌀 Girar portada</button>
-                <button class="extra" onclick="favoritoActual()">❤️ Favorito</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- REPRODUCTOR MINI -->
-    <div id="mini" class="mini-player" onclick="abrirReproductor()">
-        <img id="miniImg" src="">
-        <div class="mini-info">
-            <b id="miniTitulo">Sin canciones</b>
-            <small id="miniArtista">...</small>
-        </div>
-        <button id="miniPlay" class="mini-play" onclick="event.stopPropagation(); reproducir()">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-    </div>
-
-    <!-- BARRA DE NAVEGACIÓN -->
-    <nav class="navegacion">
-        <button id="navInicio" class="nav-btn activo" onclick="mostrarVista('inicio')"><span>⌂</span> Inicio</button>
-        <button id="navBuscar" class="nav-btn" onclick="mostrarVista('buscar')"><span>⌕</span> Buscar</button>
-        <button id="navBiblioteca" class="nav-btn" onclick="mostrarVista('biblioteca')"><span>III</span> Tu biblioteca</button>
-        <button id="navCrear" class="nav-btn" onclick="abrirCrearPlaylist()"><span>➕</span> Crear</button>
-    </nav>
-
-    <!-- MODALES -->
-    <div id="modalCrearPlaylist" class="modal">
-        <div class="modal-caja">
-            <h3>Poner nombre a la playlist</h3>
-            <div class="busqueda" style="width:100%; margin: 15px 0;">
-                <input type="text" id="inputNombrePlaylist" placeholder="Mi playlist" style="background:#222; color:#fff; border:1px solid #444; width:100%; border-radius:12px; outline:none; padding:15px;">
-            </div>
-            <div style="display:flex; gap:10px; justify-content:center;">
-                <button class="cerrar" style="background:#333; color:#fff; margin-top:0;" onclick="cerrarModales()">Cancelar</button>
-                <button class="cerrar" style="background:#1ed760; margin-top:0;" onclick="confirmarCrearPlaylist()">Crear</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modalAgregarPlaylist" class="modal">
-        <div class="modal-caja">
-            <h3>Añadir a playlist</h3>
-            <div id="opcionesAgregarPlaylist" class="modal-opciones" style="max-height:50vh; overflow-y:auto;"></div>
-            <button class="cerrar" onclick="cerrarModales()">Cerrar</button>
-        </div>
-    </div>
-
-<script>
-const SVG_PLAY = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
-const SVG_PAUSE = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
-const SVG_DOWN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`;
-const SVG_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
-const SVG_LOAD = `<svg class="spin-anim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>`;
-
+<audio id="audio"></audio>
+<audio id="audioSec"></audio>
+<div id="inicioCarga">
+<h1 class="texto-bienvenida">Bienvenido</h1>
+<div class="sub-bienvenida">H.g Music</div>
+</div>
+<header>
+<h1 class="logo logo-head">H.g Music</h1>
+<button id="ajustesBtn" class="ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="19" height="19"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
+</header>
+<div id="menu" class="menu">
+<h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12.5" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"></path></svg> Personalizar</h3>
+<div class="seccion">
+<small>Color principal</small>
+<div class="colores">
+<button class="color azul" data-c="#008cff"></button>
+<button class="color verde" data-c="#1ed760"></button>
+<button class="color rojo" data-c="#ff3030"></button>
+<button class="color morado" data-c="#8a2be2"></button>
+<button class="color rosado" data-c="#ff1493"></button>
+<button class="color amarillo" data-c="#ffd000"></button>
+<button class="color celeste" data-c="#00cfff"></button>
+<button class="color naranja" data-c="#ff7a00"></button>
+<button class="color turquesa" data-c="#00e5c3"></button>
+<button class="color fucsia" data-c="#ff00a8"></button>
+<button class="color lima" data-c="#a8ff00"></button>
+<button class="color dorado" data-c="#ffb000"></button>
+<button class="color coral" data-c="#ff5f5f"></button>
+<button class="color menta" data-c="#00ff9d"></button>
+<button class="color violeta" data-c="#b000ff"></button>
+<button class="color indigo" data-c="#4b3cff"></button>
+<button class="color azulclaro" data-c="#00aaff"></button>
+<button class="color rosa" data-c="#ff69b4"></button>
+<button class="color blanco" data-c="#ffffff"></button>
+<button class="color gris" data-c="#666666"></button>
+</div>
+</div>
+<div class="seccion">
+<small><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Volumen</small>
+<input type="range" id="volumen" min="0" max="1" step="0.01" value="1" style="width:100%; accent-color:var(--c); cursor:pointer;">
+</div>
+<div class="seccion">
+<div style="font-weight:bold; font-size:14px; margin-bottom:4px;">Crossfade</div>
+<small style="margin-bottom:8px; display:block; line-height:1.3; color:#aaa;">Ajusta la duración de la finalización gradual y la superposición entre canciones.</small>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; font-size:12px; color:#aaa;">
+<span id="crossfadeLabel">0 s</span>
+<span>12 s</span>
+</div>
+<input type="range" id="crossfade" min="0" max="12" step="1" value="0" style="width:100%; accent-color:var(--c); cursor:pointer;">
+</div>
+</div>
+<!-- VISTA 1: INICIO -->
+<div id="vistaInicio" class="vista activa">
+<h1 class="saludo">Bienvenido</h1>
+<div class="ambient-hero" aria-hidden="true">
+<div class="aurora aurora-1"></div>
+<div class="aurora aurora-2"></div>
+<div class="aurora aurora-3"></div>
+<div class="aurora aurora-4"></div>
+<div class="aurora-vein"></div>
+<p class="ambient-caption">Tu música, a tu ritmo</p>
+</div>
+</div>
+<!-- VISTA 2: BUSCAR -->
+<div id="vistaBuscar" class="vista">
+<div id="busqueda" class="busqueda">
+<span class="icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+<input type="text" id="buscar" placeholder="Escribe el nombre de una canción o artista.">
+<button id="limpiar" class="limpiar">✕</button>
+</div>
+<h2 id="tituloResultados" class="titulo-resultados">Buscar</h2>
+<div id="resultados">
+<div class="sin-resultados"><strong><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Busca una canción</strong>Escribe el nombre de una canción o artista.</div>
+</div>
+</div>
+<!-- VISTA 3: TU BIBLIOTECA -->
+<div id="vistaBiblioteca" class="vista">
+<div class="panel">
+<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> Mis Playlists</h2>
+<div id="listaPlaylistsBiblioteca"></div>
+</div>
+<div class="panel">
+<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg> Favoritos</h2>
+<div id="favoritos"></div>
+</div>
+<div class="panel">
+<h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Historial</h2>
+<div id="historial"></div>
+</div>
+</div>
+<!-- VISTA DETALLE DE PLAYLIST -->
+<div id="vistaDetallePlaylist" class="vista">
+<div class="playlist-header-top">
+<button class="volver" onclick="volverAnterior()">←</button>
+<input type="text" id="inputBuscarPlaylist" placeholder="Buscar en la playlist" oninput="filtrarCancionesPlaylist()">
+</div>
+<div style="text-align:center; margin-top:10px;">
+<div id="plCollage" class="playlist-collage"></div>
+</div>
+<h1 id="plNombre" style="margin:10px 0 5px; font-size:34px; font-weight:900;">Nombre Playlist</h1>
+<div id="plStats" style="color:#aaa; font-size:13px; margin-bottom:15px; font-weight:500;">
+0 canciones
+</div>
+<div class="playlist-action-bar">
+<!-- BOTÓN ALEATORIO -->
+<button id="plAleatorioBtn" class="p-icon" onclick="alternarAleatorio()" title="Modo Aleatorio">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+</button>
+<!-- BOTÓN DESCARGAR INTELIGENTE -->
+<button id="plDescargarBtn" class="p-icon" onclick="descargarPlaylistActiva()" title="Descargar Playlist">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+</button>
+<div style="flex:1;"></div>
+<!-- BOTÓN PLAY PRINCIPAL -->
+<button id="plPlayBtn" class="play-blue" onclick="toggleReproducirPlaylistActiva()">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+</button>
+</div>
+<div id="plCanciones"></div>
+</div>
+<!-- VISTA 4: REPRODUCTOR -->
+<div id="vistaReproductor" class="vista">
+<button class="volver" onclick="volverAnterior()">←</button>
+<div id="reproductor" class="musica">
+<div class="superior">
+<div id="contenedorPortada" class="portada" onclick="alternarGiroPortada()" title="Toca para pausar/activar el giro de la portada"><img id="portada" src=""></div>
+<div class="datos">
+<h3 id="titulo" class="titulo">Sin canciones</h3>
+<div id="artista" class="artista">Agrega tus canciones</div>
+<div id="estado" class="estado">Listo para reproducir</div>
+</div>
+</div>
+<div id="barra" class="barra"><div id="progreso" class="progreso"></div></div>
+<div class="tiempo"><span id="actual">0:00</span><span id="duracion">0:00</span></div>
+<div class="controles">
+<button class="boton" onclick="anterior()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM20 18L10.5 12 20 6v12z"/></svg></button>
+<button id="play" class="play-blue" onclick="reproducir()">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+</button>
+<button class="boton" onclick="siguiente()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM4 6l9.5 6L4 18V6z"/></svg></button>
+</div>
+<div class="extra-controles">
+<button id="aleatorio" class="extra" onclick="alternarAleatorio()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg> Aleatorio</button>
+<button id="repetir" class="extra" onclick="alternarRepetir()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg> Repetir</button>
+<button id="girarPortadaBtn" class="extra activo" onclick="alternarGiroPortada()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg> Girar portada</button>
+<button class="extra" onclick="favoritoActual()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg> Favorito</button>
+</div>
+</div>
+</div>
+<!-- REPRODUCTOR MINI -->
+<div id="mini" class="mini-player" onclick="abrirReproductor()">
+<img id="miniImg" src="">
+<div class="mini-info">
+<b id="miniTitulo">Sin canciones</b>
+<small id="miniArtista">...</small>
+</div>
+<button id="miniPlay" class="mini-play" onclick="event.stopPropagation(); reproducir()">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+</button>
+</div>
+<!-- BARRA DE NAVEGACIÓN -->
+<nav class="navegacion">
+<button id="navInicio" class="nav-btn activo" onclick="mostrarVista('inicio')"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span> Inicio</button>
+<button id="navBuscar" class="nav-btn" onclick="mostrarVista('buscar')"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span> Buscar</button>
+<button id="navBiblioteca" class="nav-btn" onclick="mostrarVista('biblioteca')"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg></span> Tu biblioteca</button>
+<button id="navCrear" class="nav-btn" onclick="abrirCrearPlaylist()"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span> Crear</button>
+</nav>
+<!-- MODALES -->
+<div id="modalCrearPlaylist" class="modal">
+<div class="modal-caja">
+<h3>Poner nombre a la playlist</h3>
+<div class="busqueda" style="width:100%; margin: 15px 0;">
+<input type="text" id="inputNombrePlaylist" placeholder="Mi playlist" style="background:#222; color:#fff; border:1px solid #444; width:100%; border-radius:12px; outline:none; padding:15px;">
+</div>
+<div style="display:flex; gap:10px; justify-content:center;">
+<button class="cerrar" style="background:#333; color:#fff; margin-top:0;" onclick="cerrarModales()">Cancelar</button>
+<button class="cerrar" style="background:#1ed760; margin-top:0;" onclick="confirmarCrearPlaylist()">Crear</button>
+</div>
+</div>
+</div>
+<div id="modalAgregarPlaylist" class="modal">
+<div class="modal-caja">
+<h3>Añadir a playlist</h3>
+<div id="opcionesAgregarPlaylist" class="modal-opciones" style="max-height:50vh; overflow-y:auto;"></div>
+<button class="cerrar" onclick="cerrarModales()">Cerrar</button>
+</div>
+</div>
+<script>const SVG_PLAY=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;const SVG_PAUSE=`<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;const SVG_DOWN=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`;const SVG_CHECK=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;const SVG_LOAD=`<svg class="spin-anim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>`;const SVG_PLUS=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;const SVG_X=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`;const SVG_MUSIC=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>`;const SVG_FOLDER=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`;
+/* ======================================================
+   👉 AGREGA AQUÍ TUS CANCIONES 👈
+   Copia el bloque de ejemplo (quita las // del inicio de
+   cada línea) y completa los 4 datos de cada canción.
+   No olvides poner una coma "," al final de cada bloque
+   excepto en el último.
+====================================================== */
 const canciones = [
-{archivo:"https://res.cloudinary.com/ghq37xg9/video/upload/v1787420012/qdum85iqmjhfasxvshhn.mp3",portada:"https://res.cloudinary.com/ghq37xg9/image/upload/v1787420001/ahzl7v3ixp9hf8xyyx0x.jpg",nombre:"FANATICO",artista:"BLESSD J ALVAREZ"},
+ {archivo:"https://res.cloudinary.com/ghq37xg9/video/upload/v1787420012/qdum85iqmjhfasxvshhn.mp3",portada:"https://res.cloudinary.com/ghq37xg9/image/upload/v1787420001/ahzl7v3ixp9hf8xyyx0x.jpg",nombre:"FANATICO",artista:"BLESSD J ALVAREZ"},
 {archivo:"https://res.cloudinary.com/ghq37xg9/video/upload/v1787434898/guixgooslaluzeb07mt1.mp3",portada:"https://res.cloudinary.com/ghq37xg9/image/upload/v1787434895/copeppcqzfkxem20zdem.jpg",nombre:"SORNERO",artista:"BLESSD"},
 {archivo:"https://res.cloudinary.com/ghq37xg9/video/upload/v1787434903/gt6uodvjoywyhojo8fdq.mp3",portada:"https://res.cloudinary.com/ghq37xg9/image/upload/v1787434899/ke3pgm0un59pt8iu1ihd.jpg",nombre:"AGUA BENDITA",artista:"BLESSD GEEZYDEE"},
 {archivo:"https://res.cloudinary.com/ghq37xg9/video/upload/v1787434910/mqhlaq7ym5smikampuk6.mp3",portada:"https://res.cloudinary.com/ghq37xg9/image/upload/v1787434904/iujgm2faqturrb1lvwo5.jpg",nombre:"ALÓ",artista:"BLESSD FRONTI TUTU JUNH TURY"},
@@ -1417,778 +1188,31 @@ const canciones = [
   { archivo: "https://res.cloudinary.com/ghq37xg9/video/upload/v1787801353/vcwzoe5hxrmifczwjtam.mp3", portada: "https://res.cloudinary.com/ghq37xg9/image/upload/v1787801351/nvgn1iroztgzd6aco6lj.jpg", nombre: "DAME ALGO", artista: "WISIN YANDEL BAD BUNNY" },
   { archivo: "https://res.cloudinary.com/ghq37xg9/video/upload/v1787801372/ixae57uceg1jkru1bmcj.mp3", portada: "https://res.cloudinary.com/ghq37xg9/image/upload/v1787801371/nreywzhfkxoidqsh45yq.jpg", nombre: "CURÁNDOTE", artista: "GREEICY" },
   { archivo: "https://res.cloudinary.com/ghq37xg9/video/upload/v1787801389/sgvg3th94yzcn1wveyst.mp3", portada: "https://res.cloudinary.com/ghq37xg9/image/upload/v1787801388/sxlj9sbgj1oc1y8pothe.jpg", nombre: "HANDS UP", artista: "MEOVV" },
-  
+     // {
+    //     nombre: "Nombre de la canción",
+    //     artista: "Nombre del artista",
+    //     portada: "URL o ruta de la imagen de portada",
+    //     archivo: "URL o ruta del archivo de audio (mp3)"
+    // },
 ];
-
-const $=id=>document.getElementById(id);
-const audio1 = $("audio"), audio2 = $("audioSec"); 
-
-let reproductorActivo = audio1; 
-let enTransicion = false; 
-let fadeInterval = null;
-
-let indice=0, 
-    cola=JSON.parse(localStorage.hgColaV2||"[]"), 
-    favoritos=JSON.parse(localStorage.hgFavV2||"[]"), 
-    historial=JSON.parse(localStorage.hgHistV2||"[]"), 
-    conteos=JSON.parse(localStorage.hgStatsV2||"{}");
-
-let playlists = JSON.parse(localStorage.hgPlaylistsV2 || "{}"); 
-let playlistActual = null; 
-
-let aleatorio=localStorage.hgRandom==="1", 
-    repetir=localStorage.hgRepeat==="1", 
-    giroPortada=localStorage.hgGiro!=="0",
-    velocidad=+localStorage.hgSpeed||1,
-    crossfadeSec=+localStorage.hgCrossfade||0;
-
-let vistaActual="inicio", vistaAnterior="inicio"; 
-
-document.body.style.setProperty("--c-texto", "#008cff");
-
-const crossfadeInput = $("crossfade");
-const crossfadeLabel = $("crossfadeLabel");
-crossfadeInput.value = crossfadeSec;
-crossfadeLabel.textContent = crossfadeSec + " s";
-
-crossfadeInput.oninput = (e) => {
-    crossfadeSec = parseInt(e.target.value);
-    crossfadeLabel.textContent = crossfadeSec + " s";
-    localStorage.hgCrossfade = crossfadeSec;
-};
-
-function actualizarMediaSession() {
-    if ('mediaSession' in navigator && canciones.length > 0) {
-        const c = canciones[indice];
-        
-        navigator.mediaSession.metadata = new MediaMetadata({
-            title: c.nombre || "Sin título",
-            artist: c.artista || "Sin artista",
-            album: 'H.g Music',
-            artwork: [
-                { src: c.portada, sizes: '96x96', type: 'image/jpeg' },
-                { src: c.portada, sizes: '128x128', type: 'image/jpeg' },
-                { src: c.portada, sizes: '192x192', type: 'image/jpeg' },
-                { src: c.portada, sizes: '256x256', type: 'image/jpeg' },
-                { src: c.portada, sizes: '384x384', type: 'image/jpeg' },
-                { src: c.portada, sizes: '512x512', type: 'image/jpeg' }
-            ]
-        });
-
-        navigator.mediaSession.setActionHandler('play', function() { if(reproductorActivo.paused) reproducir(); });
-        navigator.mediaSession.setActionHandler('pause', function() { if(!reproductorActivo.paused) reproducir(); });
-        navigator.mediaSession.setActionHandler('previoustrack', function() { anterior(); });
-        navigator.mediaSession.setActionHandler('nexttrack', function() { siguiente(); });
-
-        if ('setPositionState' in navigator.mediaSession) {
-            try {
-                navigator.mediaSession.setPositionState({
-                    duration: reproductorActivo.duration || 0,
-                    playbackRate: reproductorActivo.playbackRate,
-                    position: reproductorActivo.currentTime || 0
-                });
-            } catch (e) {}
-        }
-    }
-}
-
-function extraerColorPortada(url, cb) {
-    const img = new Image();
-    img.crossOrigin = "Anonymous";
-    img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = 30; canvas.height = 30;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, 30, 30);
-        try {
-            const data = ctx.getImageData(0, 0, 30, 30).data;
-            let r = 0, g = 0, b = 0, total = 0;
-            for (let i = 0; i < data.length; i += 16) {
-                r += data[i]; g += data[i+1]; b += data[i+2]; total++;
-            }
-            cb(`rgb(${Math.floor(r/total)}, ${Math.floor(g/total)}, ${Math.floor(b/total)})`);
-        } catch(e) { cb(null); }
-    };
-    img.onerror = () => cb(null);
-    img.src = url;
-}
-
-$("ajustesBtn").onclick = (e) => {
-    e.stopPropagation();
-    $("menu").classList.toggle("abierto");
-};
-document.onclick = (e) => {
-    if (!e.target.closest("#menu") && !e.target.closest("#ajustesBtn")) $("menu").classList.remove("abierto");
-};
-
-const volInput = $("volumen");
-volInput.value = localStorage.hgVolumen ?? 1;
-reproductorActivo.volume = volInput.value;
-
-volInput.oninput = (e) => {
-    reproductorActivo.volume = e.target.value;
-    localStorage.hgVolumen = e.target.value;
-};
-
-function aplicarColor(c){ 
-    document.body.style.setProperty("--c", c);
-    localStorage.hgColor = c;
-} 
-if(localStorage.hgColor) aplicarColor(localStorage.hgColor);
-document.querySelectorAll(".color").forEach(b=>{ b.onclick=()=>{ aplicarColor(b.dataset.c); }; }); 
-
-function guardar(){ 
-    localStorage.hgFavV2=JSON.stringify(favoritos); 
-    localStorage.hgHistV2=JSON.stringify(historial); 
-    localStorage.hgStatsV2=JSON.stringify(conteos); 
-    localStorage.hgColaV2=JSON.stringify(cola); 
-} 
-function guardarPlaylists(){ localStorage.hgPlaylistsV2 = JSON.stringify(playlists); }
-
-function tiempo(s){ 
-    return isFinite(s)?Math.floor(s/60)+":"+String(Math.floor(s)%60).padStart(2,"0"):"0:00"; 
-} 
-
-function actualizarEstadoBotonesUI(){
-    $("aleatorio").classList.toggle("activo", aleatorio);
-    const plAleatorioBtn = $("plAleatorioBtn");
-    if(plAleatorioBtn) plAleatorioBtn.classList.toggle("activo", aleatorio);
-
-    $("repetir").classList.toggle("activo", repetir);
-
-    const contPortada = $("contenedorPortada");
-    const btnGirar = $("girarPortadaBtn");
-    if(contPortada) contPortada.classList.toggle("sin-giro", !giroPortada);
-    if(btnGirar) btnGirar.classList.toggle("activo", giroPortada);
-
-    let estaSonando = !reproductorActivo.paused;
-
-    const playMainBtn = $("play");
-    if(playMainBtn) {
-        playMainBtn.innerHTML = estaSonando ? SVG_PAUSE : SVG_PLAY;
-        playMainBtn.classList.toggle("reproduciendo", estaSonando);
-    }
-
-    const miniPlayBtn = $("miniPlay");
-    if(miniPlayBtn) {
-        miniPlayBtn.innerHTML = estaSonando ? SVG_PAUSE : SVG_PLAY;
-    }
-
-    const plPlayBtn = $("plPlayBtn");
-    if(plPlayBtn) {
-        let estaSonandoPlaylistActual = estaSonando && playlistActual && playlists[playlistActual] && playlists[playlistActual].includes(indice);
-        plPlayBtn.innerHTML = estaSonandoPlaylistActual ? SVG_PAUSE : SVG_PLAY;
-        plPlayBtn.classList.toggle("reproduciendo", estaSonandoPlaylistActual);
-    }
-}
-
-function alternarGiroPortada(){
-    giroPortada = !giroPortada;
-    localStorage.hgGiro = giroPortada ? "1" : "0";
-    actualizarEstadoBotonesUI();
-}
-
-function mostrarVista(v){ 
-    vistaActual=v; 
-    document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activa")); 
-    document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("activo")); 
-    
-    if(v==="inicio"){ $("vistaInicio").classList.add("activa"); $("navInicio").classList.add("activo"); } 
-    if(v==="buscar"){ $("vistaBuscar").classList.add("activa"); $("navBuscar").classList.add("activo"); setTimeout(()=>$("buscar").focus(),100); } 
-    if(v==="biblioteca"){ $("vistaBiblioteca").classList.add("activa"); $("navBiblioteca").classList.add("activo"); mostrarBiblioteca(); } 
-    window.scrollTo({top:0,behavior:"smooth"}); 
-} 
-
-function abrirReproductor(){ 
-    vistaAnterior=vistaActual; 
-    document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activa")); 
-    $("vistaReproductor").classList.add("activa"); 
-    window.scrollTo({top:0,behavior:"smooth"}); 
-} 
-
-function volverAnterior(){ 
-    document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activa")); 
-    if(vistaAnterior==="buscar"){ $("vistaBuscar").classList.add("activa"); $("navBuscar").classList.add("activo"); } 
-    else if(vistaAnterior==="biblioteca") { $("vistaBiblioteca").classList.add("activa"); $("navBiblioteca").classList.add("activo"); }
-    else if(vistaAnterior==="detallePlaylist") { $("vistaDetallePlaylist").classList.add("activa"); }
-    else{ $("vistaInicio").classList.add("activa"); $("navInicio").classList.add("activo"); } 
-    vistaActual=vistaAnterior; 
-} 
-
-function cargar(n=indice){ 
-    if(!canciones.length)return; 
-    const c=canciones[n]; 
-    $("portada").src=$("miniImg").src=c.portada; 
-    $("titulo").textContent=$("miniTitulo").textContent=c.nombre; 
-    $("artista").textContent=$("miniArtista").textContent=c.artista; 
-    reproductorActivo.pause(); reproductorActivo.removeAttribute("src"); reproductorActivo.load(); 
-    reproductorActivo.src=c.archivo; reproductorActivo.playbackRate=velocidad; 
-} 
-
-function reproducir(){ 
-    if(!canciones.length)return; 
-    if(reproductorActivo.paused) {
-        reproductorActivo.play().catch(()=>{$("estado").textContent="⚠️ Error";}); 
-        if (enTransicion) { let otro = (reproductorActivo === audio1) ? audio2 : audio1; otro.play(); }
-    } else {
-        reproductorActivo.pause(); 
-        if (enTransicion) { let otro = (reproductorActivo === audio1) ? audio2 : audio1; otro.pause(); }
-    }
-    actualizarEstadoBotonesUI();
-} 
-
-[audio1, audio2].forEach(aud => {
-    aud.onplay = function() { 
-        if (this !== reproductorActivo) return; 
-        if (!canciones[indice]) return; 
-        $("estado").textContent = "▶ Reproduciendo"; 
-        $("reproductor").classList.add("reproduciendo"); 
-        $("mini").classList.add("visible"); 
-        
-        const c = canciones[indice];
-        if(c && c.portada) {
-            extraerColorPortada(c.portada, (color) => {
-                if(color) {
-                    document.body.style.setProperty("--c-texto", color);
-                    document.body.style.setProperty("--c", color);
-                }
-            });
-        }
-        historial = [indice,...historial.filter(x=>x!==indice)].slice(0,10); 
-        guardar(); mostrarBiblioteca(); 
-        actualizarEstadoBotonesUI();
-        actualizarMediaSession();
-    }; 
-    
-    aud.onpause = function() { 
-        if (this !== reproductorActivo) return;
-        $("estado").textContent = "⏸ Pausado"; 
-        $("reproductor").classList.remove("reproduciendo"); 
-        actualizarEstadoBotonesUI();
-    }; 
-    
-    aud.onended = function() { 
-        if (this !== reproductorActivo) return;
-        if(crossfadeSec === 0) {
-            if(repetir){ this.currentTime=0; this.play(); } else { siguiente(); }
-        }
-    }; 
-    
-    aud.ontimeupdate = function() { 
-        if (this !== reproductorActivo) return;
-        if(this.duration) { 
-            $("progreso").style.width = (this.currentTime/this.duration)*100+"%"; 
-            $("actual").textContent = tiempo(this.currentTime); 
-
-            if (crossfadeSec > 0 && !enTransicion && (this.duration - this.currentTime <= crossfadeSec)) {
-                siguiente();
-            }
-        } 
-    }; 
-    
-    aud.onloadedmetadata = function() { 
-        if (this !== reproductorActivo) return;
-        $("duracion").textContent = tiempo(this.duration); 
-        actualizarMediaSession();
-    };
-});
-
-function cambiar(n) { 
-    if(!canciones.length) return; 
-    indice = (n + canciones.length) % canciones.length; 
-    const c = canciones[indice]; 
-
-    if (fadeInterval) {
-        clearInterval(fadeInterval);
-        fadeInterval = null;
-    }
-
-    $("portada").src = $("miniImg").src = c.portada; 
-    $("titulo").textContent = $("miniTitulo").textContent = c.nombre; 
-    $("artista").textContent = $("miniArtista").textContent = c.artista; 
-    $("progreso").style.width = "0"; $("actual").textContent = "0:00"; 
-
-    let userVol = parseFloat(volInput.value) || 1;
-    let reproductorFondo = (reproductorActivo === audio1) ? audio2 : audio1;
-
-    if (crossfadeSec > 0 && !reproductorActivo.paused) {
-        enTransicion = true; 
-        let reproductorAnterior = reproductorActivo; 
-        
-        reproductorFondo.src = c.archivo;
-        reproductorFondo.playbackRate = velocidad;
-        reproductorFondo.volume = 0;
-        
-        reproductorActivo = reproductorFondo; 
-
-        reproductorFondo.play().then(() => {
-            let steps = 25;
-            let intervalTime = (crossfadeSec * 1000) / steps;
-            let step = 0;
-
-            fadeInterval = setInterval(() => {
-                step++;
-                let progress = step / steps;
-                
-                reproductorAnterior.volume = Math.max(0, userVol * (1 - progress));
-                reproductorActivo.volume = Math.min(userVol, userVol * progress);
-
-                if (step >= steps) {
-                    clearInterval(fadeInterval);
-                    fadeInterval = null;
-                    
-                    reproductorAnterior.pause();
-                    reproductorAnterior.removeAttribute("src");
-                    reproductorAnterior.load(); 
-                    
-                    reproductorActivo.volume = userVol;
-                    enTransicion = false; 
-                }
-            }, intervalTime);
-        }).catch(() => {
-            reproductorAnterior.pause();
-            reproductorActivo.volume = userVol;
-            reproductorActivo.play().catch(()=>{});
-            enTransicion = false;
-        });
-    } else {
-        reproductorFondo.pause();
-        reproductorActivo.pause(); 
-        reproductorActivo.removeAttribute("src"); 
-        reproductorActivo.load(); 
-        
-        reproductorActivo.src = c.archivo; 
-        reproductorActivo.playbackRate = velocidad;
-        reproductorActivo.volume = userVol;
-        reproductorActivo.play().catch(()=>{}); 
-        enTransicion = false;
-    }
-
-    historial = [indice,...historial.filter(x=>x!==indice)].slice(0,10); 
-    guardar(); mostrarBiblioteca(); 
-    actualizarEstadoBotonesUI();
-    actualizarMediaSession(); 
-} 
-
-function siguiente(){ 
-    if(!canciones.length) return; 
-
-    if(cola.length > 0) {
-        let n;
-        if(aleatorio) {
-            let rIdx = Math.floor(Math.random() * cola.length);
-            n = cola.splice(rIdx, 1)[0];
-        } else {
-            n = cola.shift();
-        }
-        guardar();
-        cambiar(n);
-        return;
-    }
-
-    if(aleatorio) {
-        if (playlistActual && playlists[playlistActual] && playlists[playlistActual].length > 0) {
-            let list = playlists[playlistActual];
-            let n = list[Math.floor(Math.random() * list.length)];
-            cambiar(n);
-        } else {
-            let n = Math.floor(Math.random() * canciones.length);
-            cambiar(n);
-        }
-    } else {
-        cambiar((indice + 1) % canciones.length);
-    }
-} 
-
-function anterior(){ 
-    if(!canciones.length)return; 
-    if(reproductorActivo.currentTime>5){ reproductorActivo.currentTime=0; return; } 
-    cambiar((indice-1+canciones.length)%canciones.length); 
-} 
-
-$("barra").onclick=e=>{ 
-    if(!reproductorActivo.duration)return; 
-    let r=$("barra").getBoundingClientRect(); 
-    reproductorActivo.currentTime=((e.clientX-r.left)/r.width)*reproductorActivo.duration; 
-}; 
-
-function abrirCrearPlaylist(){
-    $("modalCrearPlaylist").classList.add("abierto");
-    $("inputNombrePlaylist").value = "";
-    setTimeout(() => $("inputNombrePlaylist").focus(), 100);
-}
-function confirmarCrearPlaylist(){
-    let nombre = $("inputNombrePlaylist").value.trim();
-    if (!nombre) return;
-    if (playlists[nombre]) { alert("Ya existe una playlist con ese nombre."); return; }
-    playlists[nombre] = [];
-    guardarPlaylists();
-    cerrarModales();
-    mostrarBibliotecaPlaylists();
-    mostrarVista('biblioteca'); 
-}
-function abrirMenuAgregarAPlaylist(n){
-    let contenedor = $("opcionesAgregarPlaylist");
-    contenedor.innerHTML = "";
-
-    Object.keys(playlists).forEach(nombre => {
-        let estaIncluda = playlists[nombre].includes(n);
-        let div = document.createElement("div");
-        div.className = "cola-opcion";
-        
-        let p_songs = playlists[nombre];
-        let cover = p_songs.length > 0 && canciones[p_songs[0]] ? canciones[p_songs[0]].portada : "";
-        let imgHTML = cover ? `<img src="${cover}">` : `<div style="width:48px;height:48px;border-radius:10px;background:#333;display:flex;align-items:center;justify-content:center;font-size:20px;">📁</div>`;
-
-        div.innerHTML = `${imgHTML}<div class="cola-opcion-info"><b>${nombre}</b><small>${playlists[nombre].length} canciones</small></div><button class="boton-agregar">${estaIncluda ? "✓" : "➕"}</button>`;
-        div.querySelector("button").onclick = () => {
-            let idx = playlists[nombre].indexOf(n);
-            if (idx < 0) { playlists[nombre].push(n); div.querySelector("button").textContent = "✓"; } 
-            else { playlists[nombre].splice(idx, 1); div.querySelector("button").textContent = "➕"; }
-            guardarPlaylists();
-            mostrarBibliotecaPlaylists();
-            if(playlistActual === nombre) {
-                verificarEstadoDescargaPlaylist();
-                renderizarCancionesPlaylist(playlists[playlistActual]);
-            }
-        };
-        contenedor.appendChild(div);
-    });
-    let divNueva = document.createElement("div");
-    divNueva.className = "cola-opcion";
-    divNueva.style.cursor = "pointer";
-    divNueva.innerHTML = `<div style="width:48px;height:48px;border-radius:10px;background:#1ed760;display:flex;align-items:center;justify-content:center;color:#000;font-size:24px;">➕</div><div class="cola-opcion-info"><b>Crear nueva playlist</b><small>Añadir a una nueva lista</small></div>`;
-    divNueva.onclick = () => { cerrarModales(); abrirCrearPlaylist(); };
-    contenedor.appendChild(divNueva);
-    $("modalAgregarPlaylist").classList.add("abierto");
-}
-
-function mostrarBibliotecaPlaylists(){
-    let contenedor = $("listaPlaylistsBiblioteca");
-    if (!contenedor) return;
-    contenedor.innerHTML = "";
-    let nombres = Object.keys(playlists);
-    
-    if (!nombres.length) {
-        contenedor.innerHTML = '<div class="vacio">No tienes playlists. Toca "Crear" en el menú para empezar.</div>';
-        return;
-    }
-    nombres.forEach(nombre => {
-        let el = document.createElement("div");
-        el.className = "cancion"; 
-        
-        let p_songs = playlists[nombre];
-        let covers = [...new Set(p_songs.map(n => canciones[n]?.portada).filter(Boolean))];
-        
-        let imgHTML = "";
-        if (covers.length >= 4) {
-             imgHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; width:100%; height:100%;"><img src="${covers[0]}" style="width:100%;height:100%;object-fit:cover;"><img src="${covers[1]}" style="width:100%;height:100%;object-fit:cover;"><img src="${covers[2]}" style="width:100%;height:100%;object-fit:cover;"><img src="${covers[3]}" style="width:100%;height:100%;object-fit:cover;"></div>`;
-        } else if (covers.length > 0) {
-             imgHTML = `<img src="${covers[0]}" style="width:100%; height:100%; object-fit:cover;">`;
-        } else {
-             imgHTML = `<div style="width:100%; height:100%; background:#282828; display:flex; align-items:center; justify-content:center; font-size:24px;">🎵</div>`;
-        }
-        
-        el.innerHTML = `
-            <div class="mini" style="border-radius:4px; overflow:hidden;">${imgHTML}</div>
-            <div class="info">
-                <div class="nombre">${nombre}</div>
-                <div class="artista-lista">Playlist • Tú</div>
-            </div>
-        `;
-        el.onclick = () => abrirDetallePlaylist(nombre);
-        contenedor.appendChild(el);
-    });
-}
-
-function abrirDetallePlaylist(nombre) {
-    playlistActual = nombre;
-    vistaAnterior = vistaActual;
-    document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activa"));
-    $("vistaDetallePlaylist").classList.add("activa");
-    vistaActual = "detallePlaylist";
-    window.scrollTo({top:0,behavior:"smooth"});
-
-    $("plNombre").textContent = nombre;
-    $("inputBuscarPlaylist").value = ""; 
-    
-    verificarEstadoDescargaPlaylist(); 
-    renderizarCancionesPlaylist(playlists[nombre] || []);
-}
-
-function renderizarCancionesPlaylist(songs) {
-    $("plStats").textContent = `${songs.length} canciones`;
-
-    let covers = [...new Set(songs.map(n => canciones[n]?.portada).filter(Boolean))];
-    let cHTML = "";
-    if (covers.length >= 4) {
-        cHTML = `<div class="collage-4"><img src="${covers[0]}"><img src="${covers[1]}"><img src="${covers[2]}"><img src="${covers[3]}"></div>`;
-    } else if (covers.length > 0) {
-        cHTML = `<div class="collage-1"><img src="${covers[0]}"></div>`;
-    } else {
-        cHTML = `<div class="collage-1" style="display:flex; align-items:center; justify-content:center; font-size:50px;">🎵</div>`;
-    }
-    $("plCollage").innerHTML = cHTML;
-
-    $("plCanciones").innerHTML = "";
-    if (songs.length === 0) {
-        $("plCanciones").innerHTML = '<div class="vacio">No hay canciones que coincidan o la playlist está vacía.</div>';
-    } else {
-        songs.forEach((n) => { 
-            if (canciones[n]) {
-                let c = canciones[n];
-                let div = document.createElement("div");
-                div.className = "cancion" + (n === indice ? " actual" : "");
-                div.innerHTML = `
-                    <div class="mini"><img src="${c.portada}"></div>
-                    <div class="info">
-                        <div class="nombre">${c.nombre}</div>
-                        <div class="artista-lista">${c.artista}</div>
-                    </div>
-                    <button class="add-btn" onclick="event.stopPropagation(); removerDePlaylistActiva(${n})" title="Quitar de playlist">❌</button>
-                `;
-                div.onclick = () => { 
-                    playlistActual = playlistActual;
-                    let arr = [...playlists[playlistActual]];
-                    let realIdx = arr.indexOf(n);
-                    cola = arr.filter((_, i) => i !== realIdx); 
-                    guardar();
-                    cambiar(n);
-                };
-                $("plCanciones").appendChild(div);
-            } 
-        });
-    }
-    actualizarEstadoBotonesUI();
-}
-
-function filtrarCancionesPlaylist() {
-    if (!playlistActual || !playlists[playlistActual]) return;
-    let texto = $("inputBuscarPlaylist").value.toLowerCase().trim();
-    let listaOriginal = playlists[playlistActual];
-
-    if (!texto) {
-        renderizarCancionesPlaylist(listaOriginal);
-        return;
-    }
-
-    let filtradas = listaOriginal.filter(n => {
-        let c = canciones[n];
-        if (!c) return false;
-        return c.nombre.toLowerCase().includes(texto) || c.artista.toLowerCase().includes(texto);
-    });
-
-    renderizarCancionesPlaylist(filtradas);
-}
-
-function removerDePlaylistActiva(n) {
-    let arr = playlists[playlistActual];
-    let idx = arr.indexOf(n);
-    if(idx > -1) {
-        arr.splice(idx, 1);
-        guardarPlaylists();
-        verificarEstadoDescargaPlaylist();
-        filtrarCancionesPlaylist(); 
-        mostrarBibliotecaPlaylists();
-    }
-}
-
-function toggleReproducirPlaylistActiva() {
-    if (!playlistActual || !playlists[playlistActual].length) return;
-    let estaSonandoPlaylistActual = !reproductorActivo.paused && playlists[playlistActual].includes(indice);
-    if(estaSonandoPlaylistActual) {
-        reproducir();
-    } else {
-        reproducirPlaylistActiva();
-    }
-}
-
-function reproducirPlaylistActiva() {
-    if (!playlistActual || !playlists[playlistActual].length) return;
-    let arr = [...playlists[playlistActual]];
-    let primero;
-    if (aleatorio) {
-        let rIdx = Math.floor(Math.random() * arr.length);
-        primero = arr.splice(rIdx, 1)[0];
-    } else {
-        primero = arr.shift();
-    }
-    cola = arr; 
-    guardar(); 
-    cambiar(primero);
-}
-
-function buscarCanciones(){ 
-    let texto=$("buscar").value.toLowerCase().trim(); $("resultados").innerHTML=""; 
-    if(!texto){ return; } 
-    const encontrados=canciones.filter(c=>c.nombre.toLowerCase().includes(texto)||c.artista.toLowerCase().includes(texto)); 
-    encontrados.forEach(c=>{ 
-        const n=canciones.indexOf(c), e=document.createElement("div"); 
-        e.className="resultado"; 
-        e.innerHTML=`<img src="${c.portada}" loading="lazy"><div class="resultado-info"><b>${c.nombre}</b><small>${c.artista}</small></div>
-        <button class="add-btn" title="Añadir a playlist">➕</button><button class="resultado-play">▶</button>`; 
-        e.onclick=(ev)=>{
-            if(ev.target.classList.contains("add-btn")){ ev.stopPropagation(); abrirMenuAgregarAPlaylist(n); return; }
-            cambiar(n);
-        }; 
-        $("resultados").appendChild(e); 
-    }); 
-} 
-$("buscar").oninput=()=>{ buscarCanciones(); }; 
-
-function favorito(n){ 
-    let i=favoritos.indexOf(n); if(i<0) favoritos.push(n); else favoritos.splice(i,1); 
-    guardar(); mostrarBiblioteca(); 
-} 
-function favoritoActual(){ if(canciones.length) favorito(indice); } 
-
-function cancion(n){ 
-    const c=canciones[n]; let el=document.createElement("div"); 
-    el.className="cancion"+(n===indice?" actual":""); 
-    el.innerHTML=`<div class="mini"><img src="${c.portada}"></div><div class="info"><div class="nombre">${c.nombre}</div><div class="artista-lista">${c.artista}</div></div>
-    <button class="add-btn" title="Añadir a playlist">➕</button>
-    <button class="fav ${favoritos.includes(n)?"activo":""}">${favoritos.includes(n)?"♥":"♡"}</button>`; 
-    el.onclick=e=>{ 
-        if(e.target.closest(".fav")){ e.stopPropagation(); favorito(n); return; } 
-        if(e.target.closest(".add-btn")){ e.stopPropagation(); abrirMenuAgregarAPlaylist(n); return; } 
-        cambiar(n); 
-    }; 
-    return el; 
-} 
-
-function mostrarFavoritos(){ 
-    $("favoritos").innerHTML=""; 
-    if(!favoritos.length){ $("favoritos").innerHTML='<div class="vacio">No tienes favoritos ❤️</div>'; return; } 
-    favoritos.forEach(n=>{ if(canciones[n]) $("favoritos").appendChild(cancion(n)); }); 
-} 
-function mostrarHistorial(){ 
-    $("historial").innerHTML=""; 
-    if(!historial.length){ $("historial").innerHTML='<div class="vacio">Todavía no hay historial.</div>'; return; } 
-    historial.forEach(n=>{ if(canciones[n]) $("historial").appendChild(cancion(n)); }); 
-} 
-function mostrarBiblioteca(){ 
-    mostrarBibliotecaPlaylists(); mostrarFavoritos(); mostrarHistorial(); 
-} 
-
-function alternarAleatorio(){ 
-    aleatorio=!aleatorio; 
-    localStorage.hgRandom=aleatorio?"1":"0"; 
-    actualizarEstadoBotonesUI();
-} 
-function alternarRepetir(){ 
-    repetir=!repetir; 
-    localStorage.hgRepeat=repetir?"1":"0"; 
-    actualizarEstadoBotonesUI();
-} 
-function cerrarModales(){ document.querySelectorAll(".modal").forEach(x=>x.classList.remove("abierto")); } 
-
-function crearHome(){ 
-    const recomendados=$("recomendados"), populares=$("populares"); 
-    canciones.slice(0,10).forEach((c,n)=>{ 
-        let e=document.createElement("div"); e.className="tarjeta"; 
-        e.innerHTML=`<img src="${c.portada}"><b>${c.nombre}</b><small>${c.artista}</small>`; e.onclick=()=>cambiar(n); recomendados.appendChild(e); 
-    }); 
-} 
-
-async function descargarPlaylistActiva() {
-    if (!playlistActual || !playlists[playlistActual] || playlists[playlistActual].length === 0) {
-        alert("No hay canciones en esta playlist para descargar.");
-        return;
-    }
-
-    const btn = $("plDescargarBtn");
-    btn.innerHTML = SVG_LOAD;
-    btn.style.pointerEvents = "none";
-
-    try {
-        const cache = await caches.open('hg-music-v3'); 
-        let cancionesPlaylist = playlists[playlistActual];
-        
-        let promesas = cancionesPlaylist.map(async (idx) => {
-            let c = canciones[idx];
-            if (c) {
-                try {
-                    let resAudio = await fetch(c.archivo);
-                    if(resAudio.ok) await cache.put(c.archivo, resAudio.clone());
-                    
-                    let resPortada = await fetch(c.portada);
-                    if(resPortada.ok) await cache.put(c.portada, resPortada.clone());
-                } catch(e) {
-                    console.log("No se pudo descargar: " + c.nombre);
-                }
-            }
-        });
-
-        await Promise.all(promesas);
-        verificarEstadoDescargaPlaylist();
-        btn.style.pointerEvents = "auto";
-        
-    } catch (error) {
-        console.error(error);
-        btn.innerHTML = SVG_DOWN;
-        btn.style.pointerEvents = "auto";
-        alert("❌ Hubo un error al descargar. Intenta de nuevo.");
-    }
-}
-
-async function verificarEstadoDescargaPlaylist() {
-    if (!playlistActual || !playlists[playlistActual]) return;
-    const btn = $("plDescargarBtn");
-    if (!btn) return;
-
-    let cancionesPlaylist = playlists[playlistActual];
-    if (cancionesPlaylist.length === 0) {
-        btn.innerHTML = SVG_DOWN;
-        btn.classList.remove("activo");
-        return;
-    }
-
-    try {
-        const cache = await caches.open('hg-music-v3');
-        let todasDescargadas = true;
-
-        for (let idx of cancionesPlaylist) {
-            let c = canciones[idx];
-            if (c) {
-                let matchAudio = await cache.match(c.archivo);
-                let matchPortada = await cache.match(c.portada);
-                if (!matchAudio || !matchPortada) {
-                    todasDescargadas = false;
-                    break;
-                }
-            }
-        }
-
-        if (todasDescargadas) {
-            btn.innerHTML = SVG_CHECK;
-            btn.classList.add("activo");
-        } else {
-            btn.innerHTML = SVG_DOWN;
-            btn.classList.remove("activo");
-        }
-    } catch (e) {
-        btn.innerHTML = SVG_DOWN;
-        btn.classList.remove("activo");
-    }
-}
-
-crearHome(); 
-mostrarBiblioteca(); 
-if(canciones.length > 0) cargar(0); 
-actualizarEstadoBotonesUI();
-actualizarMediaSession(); 
-
-document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activa")); 
-$("vistaInicio").classList.add("activa"); 
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log('PWA activada correctamente'))
-        .catch(err => console.log('Error al activar PWA', err));
-    });
-  }
-</script>
+/* ====================================================== */
+const $=id=>document.getElementById(id);const audio1=$("audio"),audio2=$("audioSec");let reproductorActivo=audio1;let enTransicion=false;let fadeInterval=null;let indice=0,cola=JSON.parse(localStorage.hgColaV2||"[]"),favoritos=JSON.parse(localStorage.hgFavV2||"[]"),historial=JSON.parse(localStorage.hgHistV2||"[]"),conteos=JSON.parse(localStorage.hgStatsV2||"{}");let playlists=JSON.parse(localStorage.hgPlaylistsV2||"{}");let playlistActual=null;let aleatorio=localStorage.hgRandom==="1",repetir=localStorage.hgRepeat==="1",giroPortada=localStorage.hgGiro!=="0",velocidad=+localStorage.hgSpeed||1,crossfadeSec=+localStorage.hgCrossfade||0;let vistaActual="inicio",vistaAnterior="inicio";document.body.style.setProperty("--c-texto","#008cff");const crossfadeInput=$("crossfade");const crossfadeLabel=$("crossfadeLabel");crossfadeInput.value=crossfadeSec;crossfadeLabel.textContent=crossfadeSec+" s";crossfadeInput.oninput=e=>{crossfadeSec=parseInt(e.target.value);crossfadeLabel.textContent=crossfadeSec+" s";localStorage.hgCrossfade=crossfadeSec};function actualizarMediaSession(){if("mediaSession"in navigator&&canciones.length>0){const c=canciones[indice];navigator.mediaSession.metadata=new MediaMetadata({title:c.nombre||"Sin t\xEDtulo",artist:c.artista||"Sin artista",album:"H.g Music",artwork:[{src:c.portada,sizes:"96x96",type:"image/jpeg"},{src:c.portada,sizes:"128x128",type:"image/jpeg"},{src:c.portada,sizes:"192x192",type:"image/jpeg"},{src:c.portada,sizes:"256x256",type:"image/jpeg"},{src:c.portada,sizes:"384x384",type:"image/jpeg"},{src:c.portada,sizes:"512x512",type:"image/jpeg"}]});navigator.mediaSession.setActionHandler("play",function(){if(reproductorActivo.paused)reproducir()});navigator.mediaSession.setActionHandler("pause",function(){if(!reproductorActivo.paused)reproducir()});navigator.mediaSession.setActionHandler("previoustrack",function(){anterior()});navigator.mediaSession.setActionHandler("nexttrack",function(){siguiente()});if("setPositionState"in navigator.mediaSession){try{navigator.mediaSession.setPositionState({duration:reproductorActivo.duration||0,playbackRate:reproductorActivo.playbackRate,position:reproductorActivo.currentTime||0})}catch(e){}}}}function extraerColorPortada(url,cb){const img=new Image;img.crossOrigin="Anonymous";img.onload=()=>{const canvas=document.createElement("canvas");canvas.width=30;canvas.height=30;const ctx=canvas.getContext("2d");ctx.drawImage(img,0,0,30,30);try{const data=ctx.getImageData(0,0,30,30).data;let r=0,g=0,b=0,total=0;for(let i=0;i<data.length;i+=16){r+=data[i];g+=data[i+1];b+=data[i+2];total++}cb(`rgb(${Math.floor(r/total)}, ${Math.floor(g/total)}, ${Math.floor(b/total)})`)}catch(e){cb(null)}};img.onerror=()=>cb(null);img.src=url}$("ajustesBtn").onclick=e=>{e.stopPropagation();$("menu").classList.toggle("abierto")};document.onclick=e=>{if(!e.target.closest("#menu")&&!e.target.closest("#ajustesBtn"))$("menu").classList.remove("abierto")};const volInput=$("volumen");volInput.value=localStorage.hgVolumen??1;reproductorActivo.volume=volInput.value;volInput.oninput=e=>{reproductorActivo.volume=e.target.value;localStorage.hgVolumen=e.target.value};function aplicarColor(c){document.body.style.setProperty("--c",c);document.body.style.setProperty("--c-texto",c);localStorage.hgColor=c}if(localStorage.hgColor)aplicarColor(localStorage.hgColor);document.querySelectorAll(".color").forEach(b=>{b.onclick=()=>{aplicarColor(b.dataset.c)}});function guardar(){localStorage.hgFavV2=JSON.stringify(favoritos);localStorage.hgHistV2=JSON.stringify(historial);localStorage.hgStatsV2=JSON.stringify(conteos);localStorage.hgColaV2=JSON.stringify(cola)}function guardarPlaylists(){localStorage.hgPlaylistsV2=JSON.stringify(playlists)}function tiempo(s){return isFinite(s)?Math.floor(s/60)+":"+String(Math.floor(s)%60).padStart(2,"0"):"0:00"}function actualizarEstadoBotonesUI(){$("aleatorio").classList.toggle("activo",aleatorio);const plAleatorioBtn=$("plAleatorioBtn");if(plAleatorioBtn)plAleatorioBtn.classList.toggle("activo",aleatorio);$("repetir").classList.toggle("activo",repetir);const contPortada=$("contenedorPortada");const btnGirar=$("girarPortadaBtn");if(contPortada)contPortada.classList.toggle("sin-giro",!giroPortada);if(btnGirar)btnGirar.classList.toggle("activo",giroPortada);let estaSonando=!reproductorActivo.paused;const playMainBtn=$("play");if(playMainBtn){playMainBtn.innerHTML=estaSonando?SVG_PAUSE:SVG_PLAY;playMainBtn.classList.toggle("reproduciendo",estaSonando)}const miniPlayBtn=$("miniPlay");if(miniPlayBtn){miniPlayBtn.innerHTML=estaSonando?SVG_PAUSE:SVG_PLAY}const plPlayBtn=$("plPlayBtn");if(plPlayBtn){let estaSonandoPlaylistActual=estaSonando&&playlistActual&&playlists[playlistActual]&&playlists[playlistActual].includes(indice);plPlayBtn.innerHTML=estaSonandoPlaylistActual?SVG_PAUSE:SVG_PLAY;plPlayBtn.classList.toggle("reproduciendo",estaSonandoPlaylistActual)}}function alternarGiroPortada(){giroPortada=!giroPortada;localStorage.hgGiro=giroPortada?"1":"0";actualizarEstadoBotonesUI()}function mostrarVista(v){vistaActual=v;document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activa"));document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("activo"));if(v==="inicio"){$("vistaInicio").classList.add("activa");$("navInicio").classList.add("activo")}if(v==="buscar"){$("vistaBuscar").classList.add("activa");$("navBuscar").classList.add("activo");setTimeout(()=>$("buscar").focus(),100)}if(v==="biblioteca"){$("vistaBiblioteca").classList.add("activa");$("navBiblioteca").classList.add("activo");mostrarBiblioteca()}window.scrollTo({top:0,behavior:"smooth"})}function abrirReproductor(){vistaAnterior=vistaActual;document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activa"));$("vistaReproductor").classList.add("activa");window.scrollTo({top:0,behavior:"smooth"})}function volverAnterior(){document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activa"));if(vistaAnterior==="buscar"){$("vistaBuscar").classList.add("activa");$("navBuscar").classList.add("activo")}else if(vistaAnterior==="biblioteca"){$("vistaBiblioteca").classList.add("activa");$("navBiblioteca").classList.add("activo")}else if(vistaAnterior==="detallePlaylist"){$("vistaDetallePlaylist").classList.add("activa")}else{$("vistaInicio").classList.add("activa");$("navInicio").classList.add("activo")}vistaActual=vistaAnterior}function cargar(n=indice){if(!canciones.length)return;const c=canciones[n];$("portada").src=$("miniImg").src=c.portada;$("titulo").textContent=$("miniTitulo").textContent=c.nombre;$("artista").textContent=$("miniArtista").textContent=c.artista;reproductorActivo.pause();reproductorActivo.removeAttribute("src");reproductorActivo.load();reproductorActivo.src=c.archivo;reproductorActivo.playbackRate=velocidad}function reproducir(){if(!canciones.length)return;if(reproductorActivo.paused){reproductorActivo.play().catch(()=>{$("estado").textContent="Error al reproducir"});if(enTransicion){let otro=reproductorActivo===audio1?audio2:audio1;otro.play()}}else{reproductorActivo.pause();if(enTransicion){let otro=reproductorActivo===audio1?audio2:audio1;otro.pause()}}actualizarEstadoBotonesUI()}[audio1,audio2].forEach(aud=>{aud.onplay=function(){if(this!==reproductorActivo)return;if(!canciones[indice])return;$("estado").textContent="\u25B6 Reproduciendo";$("reproductor").classList.add("reproduciendo");$("mini").classList.add("visible");const c=canciones[indice];if(c&&c.portada){extraerColorPortada(c.portada,color=>{if(color){document.body.style.setProperty("--c-texto",color);document.body.style.setProperty("--c",color)}})}historial=[indice,...historial.filter(x=>x!==indice)].slice(0,10);guardar();mostrarBiblioteca();actualizarEstadoBotonesUI();actualizarMediaSession()};aud.onpause=function(){if(this!==reproductorActivo)return;$("estado").textContent="\u23F8 Pausado";$("reproductor").classList.remove("reproduciendo");actualizarEstadoBotonesUI()};aud.onended=function(){if(this!==reproductorActivo)return;if(crossfadeSec===0){if(repetir){this.currentTime=0;this.play()}else{siguiente()}}};aud.ontimeupdate=function(){if(this!==reproductorActivo)return;if(this.duration){$("progreso").style.width=this.currentTime/this.duration*100+"%";$("actual").textContent=tiempo(this.currentTime);if(crossfadeSec>0&&!enTransicion&&this.duration-this.currentTime<=crossfadeSec){siguiente()}}};aud.onloadedmetadata=function(){if(this!==reproductorActivo)return;$("duracion").textContent=tiempo(this.duration);actualizarMediaSession()}});function cambiar(n){if(!canciones.length)return;indice=(n+canciones.length)%canciones.length;const c=canciones[indice];if(fadeInterval){clearInterval(fadeInterval);fadeInterval=null}$("portada").src=$("miniImg").src=c.portada;$("titulo").textContent=$("miniTitulo").textContent=c.nombre;$("artista").textContent=$("miniArtista").textContent=c.artista;$("progreso").style.width="0";$("actual").textContent="0:00";let userVol=parseFloat(volInput.value)||1;let reproductorFondo=reproductorActivo===audio1?audio2:audio1;if(crossfadeSec>0&&!reproductorActivo.paused){enTransicion=true;let reproductorAnterior=reproductorActivo;reproductorFondo.src=c.archivo;reproductorFondo.playbackRate=velocidad;reproductorFondo.volume=0;reproductorActivo=reproductorFondo;reproductorFondo.play().then(()=>{let steps=25;let intervalTime=crossfadeSec*1e3/steps;let step=0;fadeInterval=setInterval(()=>{step++;let progress=step/steps;reproductorAnterior.volume=Math.max(0,userVol*(1-progress));reproductorActivo.volume=Math.min(userVol,userVol*progress);if(step>=steps){clearInterval(fadeInterval);fadeInterval=null;reproductorAnterior.pause();reproductorAnterior.removeAttribute("src");reproductorAnterior.load();reproductorActivo.volume=userVol;enTransicion=false}},intervalTime)}).catch(()=>{reproductorAnterior.pause();reproductorActivo.volume=userVol;reproductorActivo.play().catch(()=>{});enTransicion=false})}else{reproductorFondo.pause();reproductorActivo.pause();reproductorActivo.removeAttribute("src");reproductorActivo.load();reproductorActivo.src=c.archivo;reproductorActivo.playbackRate=velocidad;reproductorActivo.volume=userVol;reproductorActivo.play().catch(()=>{});enTransicion=false}historial=[indice,...historial.filter(x=>x!==indice)].slice(0,10);guardar();mostrarBiblioteca();actualizarEstadoBotonesUI();actualizarMediaSession()}function siguiente(){if(!canciones.length)return;if(cola.length>0){let n;if(aleatorio){let rIdx=Math.floor(Math.random()*cola.length);n=cola.splice(rIdx,1)[0]}else{n=cola.shift()}guardar();cambiar(n);return}if(aleatorio){if(playlistActual&&playlists[playlistActual]&&playlists[playlistActual].length>0){let list=playlists[playlistActual];let n=list[Math.floor(Math.random()*list.length)];cambiar(n)}else{let n=Math.floor(Math.random()*canciones.length);cambiar(n)}}else{cambiar((indice+1)%canciones.length)}}function anterior(){if(!canciones.length)return;if(reproductorActivo.currentTime>5){reproductorActivo.currentTime=0;return}cambiar((indice-1+canciones.length)%canciones.length)}$("barra").onclick=e=>{if(!reproductorActivo.duration)return;let r=$("barra").getBoundingClientRect();reproductorActivo.currentTime=(e.clientX-r.left)/r.width*reproductorActivo.duration};function abrirCrearPlaylist(){$("modalCrearPlaylist").classList.add("abierto");$("inputNombrePlaylist").value="";setTimeout(()=>$("inputNombrePlaylist").focus(),100)}function confirmarCrearPlaylist(){let nombre=$("inputNombrePlaylist").value.trim();if(!nombre)return;if(playlists[nombre]){alert("Ya existe una playlist con ese nombre.");return}playlists[nombre]=[];guardarPlaylists();cerrarModales();mostrarBibliotecaPlaylists();mostrarVista("biblioteca")}function abrirMenuAgregarAPlaylist(n){let contenedor=$("opcionesAgregarPlaylist");contenedor.innerHTML="";Object.keys(playlists).forEach(nombre=>{let estaIncluda=playlists[nombre].includes(n);let div=document.createElement("div");div.className="cola-opcion";let p_songs=playlists[nombre];let cover=p_songs.length>0&&canciones[p_songs[0]]?canciones[p_songs[0]].portada:"";let imgHTML=cover?`<img src="${cover}">`:`<div style="width:48px;height:48px;border-radius:10px;background:#333;display:flex;align-items:center;justify-content:center;">${SVG_FOLDER.replace("<svg ",'<svg width="20" height="20" ')}</div>`;div.innerHTML=`${imgHTML}<div class="cola-opcion-info"><b>${nombre}</b><small>${playlists[nombre].length} canciones</small></div><button class="boton-agregar">${estaIncluda?SVG_CHECK.replace("<svg ",'<svg width="14" height="14" '):SVG_PLUS.replace("<svg ",'<svg width="14" height="14" ')}</button>`;div.querySelector("button").onclick=()=>{let idx=playlists[nombre].indexOf(n);if(idx<0){playlists[nombre].push(n);div.querySelector("button").innerHTML=SVG_CHECK.replace("<svg ",'<svg width="14" height="14" ')}else{playlists[nombre].splice(idx,1);div.querySelector("button").innerHTML=SVG_PLUS.replace("<svg ",'<svg width="14" height="14" ')}guardarPlaylists();mostrarBibliotecaPlaylists();if(playlistActual===nombre){verificarEstadoDescargaPlaylist();renderizarCancionesPlaylist(playlists[playlistActual])}};contenedor.appendChild(div)});let divNueva=document.createElement("div");divNueva.className="cola-opcion";divNueva.style.cursor="pointer";divNueva.innerHTML=`<div style="width:48px;height:48px;border-radius:10px;background:#1ed760;display:flex;align-items:center;justify-content:center;color:#000;">${SVG_PLUS.replace("<svg ",'<svg width="22" height="22" ')}</div><div class="cola-opcion-info"><b>Crear nueva playlist</b><small>A\xF1adir a una nueva lista</small></div>`;divNueva.onclick=()=>{cerrarModales();abrirCrearPlaylist()};contenedor.appendChild(divNueva);$("modalAgregarPlaylist").classList.add("abierto")}function mostrarBibliotecaPlaylists(){let contenedor=$("listaPlaylistsBiblioteca");if(!contenedor)return;contenedor.innerHTML="";let nombres=Object.keys(playlists);if(!nombres.length){contenedor.innerHTML='<div class="vacio">No tienes playlists. Toca "Crear" en el men\xFA para empezar.</div>';return}nombres.forEach(nombre=>{let el=document.createElement("div");el.className="cancion";let p_songs=playlists[nombre];let covers=[...new Set(p_songs.map(n=>canciones[n]?.portada).filter(Boolean))];let imgHTML="";if(covers.length>=4){imgHTML=`<div style="display:grid; grid-template-columns:1fr 1fr; width:100%; height:100%;"><img src="${covers[0]}" style="width:100%;height:100%;object-fit:cover;"><img src="${covers[1]}" style="width:100%;height:100%;object-fit:cover;"><img src="${covers[2]}" style="width:100%;height:100%;object-fit:cover;"><img src="${covers[3]}" style="width:100%;height:100%;object-fit:cover;"></div>`}else if(covers.length>0){imgHTML=`<img src="${covers[0]}" style="width:100%; height:100%; object-fit:cover;">`}else{imgHTML=`<div style="width:100%; height:100%; background:#282828; display:flex; align-items:center; justify-content:center;">${SVG_MUSIC.replace("<svg ",'<svg width="22" height="22" ')}</div>`}el.innerHTML=`
+<div class="mini" style="border-radius:4px; overflow:hidden;">${imgHTML}</div>
+<div class="info">
+<div class="nombre">${nombre}</div>
+<div class="artista-lista">Playlist \u2022 T\xFA</div>
+</div>
+`;el.onclick=()=>abrirDetallePlaylist(nombre);contenedor.appendChild(el)})}function abrirDetallePlaylist(nombre){playlistActual=nombre;vistaAnterior=vistaActual;document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activa"));$("vistaDetallePlaylist").classList.add("activa");vistaActual="detallePlaylist";window.scrollTo({top:0,behavior:"smooth"});$("plNombre").textContent=nombre;$("inputBuscarPlaylist").value="";verificarEstadoDescargaPlaylist();renderizarCancionesPlaylist(playlists[nombre]||[])}function renderizarCancionesPlaylist(songs){$("plStats").textContent=`${songs.length} canciones`;let covers=[...new Set(songs.map(n=>canciones[n]?.portada).filter(Boolean))];let cHTML="";if(covers.length>=4){cHTML=`<div class="collage-4"><img src="${covers[0]}"><img src="${covers[1]}"><img src="${covers[2]}"><img src="${covers[3]}"></div>`}else if(covers.length>0){cHTML=`<div class="collage-1"><img src="${covers[0]}"></div>`}else{cHTML=`<div class="collage-1" style="display:flex; align-items:center; justify-content:center;">${SVG_MUSIC.replace("<svg ",'<svg width="50" height="50" ')}</div>`}$("plCollage").innerHTML=cHTML;$("plCanciones").innerHTML="";if(songs.length===0){$("plCanciones").innerHTML='<div class="vacio">No hay canciones que coincidan o la playlist est\xE1 vac\xEDa.</div>'}else{songs.forEach(n=>{if(canciones[n]){let c=canciones[n];let div=document.createElement("div");div.className="cancion"+(n===indice?" actual":"");div.innerHTML=`
+<div class="mini"><img src="${c.portada}"></div>
+<div class="info">
+<div class="nombre">${c.nombre}</div>
+<div class="artista-lista">${c.artista}</div>
+</div>
+<button class="add-btn" onclick="event.stopPropagation(); removerDePlaylistActiva(${n})" title="Quitar de playlist">${SVG_X}</button>
+`;div.onclick=()=>{playlistActual=playlistActual;let arr=[...playlists[playlistActual]];let realIdx=arr.indexOf(n);cola=arr.filter((_,i)=>i!==realIdx);guardar();cambiar(n)};$("plCanciones").appendChild(div)}})}actualizarEstadoBotonesUI()}function filtrarCancionesPlaylist(){if(!playlistActual||!playlists[playlistActual])return;let texto=$("inputBuscarPlaylist").value.toLowerCase().trim();let listaOriginal=playlists[playlistActual];if(!texto){renderizarCancionesPlaylist(listaOriginal);return}let filtradas=listaOriginal.filter(n=>{let c=canciones[n];if(!c)return false;return c.nombre.toLowerCase().includes(texto)||c.artista.toLowerCase().includes(texto)});renderizarCancionesPlaylist(filtradas)}function removerDePlaylistActiva(n){let arr=playlists[playlistActual];let idx=arr.indexOf(n);if(idx>-1){arr.splice(idx,1);guardarPlaylists();verificarEstadoDescargaPlaylist();filtrarCancionesPlaylist();mostrarBibliotecaPlaylists()}}function toggleReproducirPlaylistActiva(){if(!playlistActual||!playlists[playlistActual].length)return;let estaSonandoPlaylistActual=!reproductorActivo.paused&&playlists[playlistActual].includes(indice);if(estaSonandoPlaylistActual){reproducir()}else{reproducirPlaylistActiva()}}function reproducirPlaylistActiva(){if(!playlistActual||!playlists[playlistActual].length)return;let arr=[...playlists[playlistActual]];let primero;if(aleatorio){let rIdx=Math.floor(Math.random()*arr.length);primero=arr.splice(rIdx,1)[0]}else{primero=arr.shift()}cola=arr;guardar();cambiar(primero)}function buscarCanciones(){let texto=$("buscar").value.toLowerCase().trim();$("resultados").innerHTML="";if(!texto){return}const encontrados=canciones.filter(c=>c.nombre.toLowerCase().includes(texto)||c.artista.toLowerCase().includes(texto));encontrados.forEach(c=>{const n=canciones.indexOf(c),e=document.createElement("div");e.className="resultado";e.innerHTML=`<img src="${c.portada}" loading="lazy"><div class="resultado-info"><b>${c.nombre}</b><small>${c.artista}</small></div>
+<button class="add-btn" title="A\xF1adir a playlist">${SVG_PLUS}</button><button class="resultado-play">${SVG_PLAY}</button>`;e.onclick=ev=>{if(ev.target.closest(".add-btn")){ev.stopPropagation();abrirMenuAgregarAPlaylist(n);return}cambiar(n)};$("resultados").appendChild(e)})}$("buscar").oninput=()=>{buscarCanciones()};function favorito(n){let i=favoritos.indexOf(n);if(i<0)favoritos.push(n);else favoritos.splice(i,1);guardar();mostrarBiblioteca()}function favoritoActual(){if(canciones.length)favorito(indice)}function cancion(n){const c=canciones[n];let el=document.createElement("div");el.className="cancion"+(n===indice?" actual":"");el.innerHTML=`<div class="mini"><img src="${c.portada}"></div><div class="info"><div class="nombre">${c.nombre}</div><div class="artista-lista">${c.artista}</div></div>
+<button class="add-btn" title="A\xF1adir a playlist">${SVG_PLUS}</button>
+<button class="fav ${favoritos.includes(n)?"activo":""}">${favoritos.includes(n)?"\u2665":"\u2661"}</button>`;el.onclick=e=>{if(e.target.closest(".fav")){e.stopPropagation();favorito(n);return}if(e.target.closest(".add-btn")){e.stopPropagation();abrirMenuAgregarAPlaylist(n);return}cambiar(n)};return el}function mostrarFavoritos(){$("favoritos").innerHTML="";if(!favoritos.length){$("favoritos").innerHTML='<div class="vacio">No tienes favoritos.</div>';return}favoritos.forEach(n=>{if(canciones[n])$("favoritos").appendChild(cancion(n))})}function mostrarHistorial(){$("historial").innerHTML="";if(!historial.length){$("historial").innerHTML='<div class="vacio">Todav\xEDa no hay historial.</div>';return}historial.forEach(n=>{if(canciones[n])$("historial").appendChild(cancion(n))})}function mostrarBiblioteca(){mostrarBibliotecaPlaylists();mostrarFavoritos();mostrarHistorial()}function alternarAleatorio(){aleatorio=!aleatorio;localStorage.hgRandom=aleatorio?"1":"0";actualizarEstadoBotonesUI()}function alternarRepetir(){repetir=!repetir;localStorage.hgRepeat=repetir?"1":"0";actualizarEstadoBotonesUI()}function cerrarModales(){document.querySelectorAll(".modal").forEach(x=>x.classList.remove("abierto"))}function crearHome(){}async function descargarPlaylistActiva(){if(!playlistActual||!playlists[playlistActual]||playlists[playlistActual].length===0){alert("No hay canciones en esta playlist para descargar.");return}const btn=$("plDescargarBtn");btn.innerHTML=SVG_LOAD;btn.style.pointerEvents="none";try{const cache=await caches.open("hg-music-v3");let cancionesPlaylist=playlists[playlistActual];let promesas=cancionesPlaylist.map(async idx=>{let c=canciones[idx];if(c){try{let resAudio=await fetch(c.archivo);if(resAudio.ok)await cache.put(c.archivo,resAudio.clone());let resPortada=await fetch(c.portada);if(resPortada.ok)await cache.put(c.portada,resPortada.clone())}catch(e){console.log("No se pudo descargar: "+c.nombre)}}});await Promise.all(promesas);verificarEstadoDescargaPlaylist();btn.style.pointerEvents="auto"}catch(error){console.error(error);btn.innerHTML=SVG_DOWN;btn.style.pointerEvents="auto";alert("Hubo un error al descargar. Intenta de nuevo.")}}async function verificarEstadoDescargaPlaylist(){if(!playlistActual||!playlists[playlistActual])return;const btn=$("plDescargarBtn");if(!btn)return;let cancionesPlaylist=playlists[playlistActual];if(cancionesPlaylist.length===0){btn.innerHTML=SVG_DOWN;btn.classList.remove("activo");return}try{const cache=await caches.open("hg-music-v3");let todasDescargadas=true;for(let idx of cancionesPlaylist){let c=canciones[idx];if(c){let matchAudio=await cache.match(c.archivo);let matchPortada=await cache.match(c.portada);if(!matchAudio||!matchPortada){todasDescargadas=false;break}}}if(todasDescargadas){btn.innerHTML=SVG_CHECK;btn.classList.add("activo")}else{btn.innerHTML=SVG_DOWN;btn.classList.remove("activo")}}catch(e){btn.innerHTML=SVG_DOWN;btn.classList.remove("activo")}}crearHome();mostrarBiblioteca();if(canciones.length>0)cargar(0);actualizarEstadoBotonesUI();actualizarMediaSession();document.querySelectorAll(".vista").forEach(x=>x.classList.remove("activa"));$("vistaInicio").classList.add("activa");</script>
+<script>if("serviceWorker"in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("./sw.js").then(()=>console.log("PWA activada correctamente")).catch(err=>console.log("Error al activar PWA",err))})}</script>
 </body>
 </html>
