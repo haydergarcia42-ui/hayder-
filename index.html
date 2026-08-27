@@ -129,7 +129,6 @@
     .controles{display:flex;justify-content:center;align-items:center;gap:35px;margin-top:17px} 
     .boton{border:0;display:flex;align-items:center;justify-content:center; width:54px;height:54px;border-radius:50%;background:#ffffff12;color:#fff;font-size:23px;} 
     
-    /* ESTILO UNIFICADO PARA EL BOTÓN PRINCIPAL DE REPRODUCCIÓN (IGUAL AL DE PLAYLISTS) */
     .play-blue { 
         width:58px; height:58px; border-radius:50%; 
         background:var(--c); color:#fff; 
@@ -335,12 +334,12 @@
         </div>
         
         <div class="playlist-action-bar">
-            <!-- BOTÓN ALEATORIO UNIFICADO CON LOS DEMÁS -->
+            <!-- BOTÓN ALEATORIO -->
             <button id="plAleatorioBtn" class="p-icon" onclick="alternarAleatorio()" title="Modo Aleatorio">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
             </button>
             
-            <!-- BOTÓN DESCARGAR UNIFICADO CON LOS DEMÁS -->
+            <!-- BOTÓN DESCARGAR INTELIGENTE -->
             <button id="plDescargarBtn" class="p-icon" onclick="descargarPlaylistActiva()" title="Descargar Playlist">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
             </button>
@@ -373,7 +372,6 @@
             
             <div class="controles">
                 <button class="boton" onclick="anterior()">⏮</button>
-                <!-- BOTÓN PRINCIPAL DE REPRODUCCIÓN EN EL REPRODUCTOR CAMBIADO AL ESTILO MODERNO -->
                 <button id="play" class="play-blue" onclick="reproducir()">
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 </button>
@@ -1420,12 +1418,7 @@ const canciones = [
   { archivo: "https://res.cloudinary.com/ghq37xg9/video/upload/v1787801372/ixae57uceg1jkru1bmcj.mp3", portada: "https://res.cloudinary.com/ghq37xg9/image/upload/v1787801371/nreywzhfkxoidqsh45yq.jpg", nombre: "CURÁNDOTE", artista: "GREEICY" },
   { archivo: "https://res.cloudinary.com/ghq37xg9/video/upload/v1787801389/sgvg3th94yzcn1wveyst.mp3", portada: "https://res.cloudinary.com/ghq37xg9/image/upload/v1787801388/sxlj9sbgj1oc1y8pothe.jpg", nombre: "HANDS UP", artista: "MEOVV" },
   
-
-
 ];
-
-
-
 
 const $=id=>document.getElementById(id);
 const audio1 = $("audio"), audio2 = $("audioSec"); 
@@ -1482,21 +1475,10 @@ function actualizarMediaSession() {
             ]
         });
 
-        navigator.mediaSession.setActionHandler('play', function() { 
-            if(reproductorActivo.paused) reproducir(); 
-        });
-        
-        navigator.mediaSession.setActionHandler('pause', function() { 
-            if(!reproductorActivo.paused) reproducir(); 
-        });
-        
-        navigator.mediaSession.setActionHandler('previoustrack', function() { 
-            anterior(); 
-        });
-        
-        navigator.mediaSession.setActionHandler('nexttrack', function() { 
-            siguiente(); 
-        });
+        navigator.mediaSession.setActionHandler('play', function() { if(reproductorActivo.paused) reproducir(); });
+        navigator.mediaSession.setActionHandler('pause', function() { if(!reproductorActivo.paused) reproducir(); });
+        navigator.mediaSession.setActionHandler('previoustrack', function() { anterior(); });
+        navigator.mediaSession.setActionHandler('nexttrack', function() { siguiente(); });
 
         if ('setPositionState' in navigator.mediaSession) {
             try {
@@ -1865,7 +1847,10 @@ function abrirMenuAgregarAPlaylist(n){
             else { playlists[nombre].splice(idx, 1); div.querySelector("button").textContent = "➕"; }
             guardarPlaylists();
             mostrarBibliotecaPlaylists();
-            if(playlistActual === nombre) abrirDetallePlaylist(nombre);
+            if(playlistActual === nombre) {
+                verificarEstadoDescargaPlaylist();
+                renderizarCancionesPlaylist(playlists[playlistActual]);
+            }
         };
         contenedor.appendChild(div);
     });
@@ -1926,8 +1911,8 @@ function abrirDetallePlaylist(nombre) {
 
     $("plNombre").textContent = nombre;
     $("inputBuscarPlaylist").value = ""; 
-    revisarSiEstaDescargada(); 
     
+    verificarEstadoDescargaPlaylist(); 
     renderizarCancionesPlaylist(playlists[nombre] || []);
 }
 
@@ -2002,6 +1987,7 @@ function removerDePlaylistActiva(n) {
     if(idx > -1) {
         arr.splice(idx, 1);
         guardarPlaylists();
+        verificarEstadoDescargaPlaylist();
         filtrarCancionesPlaylist(); 
         mostrarBibliotecaPlaylists();
     }
@@ -2111,22 +2097,14 @@ async function descargarPlaylistActiva() {
     }
 
     const btn = $("plDescargarBtn");
-    
-    if (btn.classList.contains("activo")) {
-        alert("✅ Esta playlist ya está guardada en tu dispositivo.");
-        return;
-    }
-
-    let confirmacion = confirm("¿Quieres descargar todas las canciones de esta playlist para escucharlas sin internet?");
-    if (!confirmacion) return;
-
     btn.innerHTML = SVG_LOAD;
     btn.style.pointerEvents = "none";
 
     try {
         const cache = await caches.open('hg-music-v3'); 
+        let cancionesPlaylist = playlists[playlistActual];
         
-        let promesas = playlists[playlistActual].map(async (idx) => {
+        let promesas = cancionesPlaylist.map(async (idx) => {
             let c = canciones[idx];
             if (c) {
                 try {
@@ -2136,19 +2114,13 @@ async function descargarPlaylistActiva() {
                     let resPortada = await fetch(c.portada);
                     if(resPortada.ok) await cache.put(c.portada, resPortada.clone());
                 } catch(e) {
-                    console.log("No se pudo descargar una parte de: " + c.nombre);
+                    console.log("No se pudo descargar: " + c.nombre);
                 }
             }
         });
 
         await Promise.all(promesas);
-
-        let descargadas = JSON.parse(localStorage.hgDescargasV2 || "{}");
-        descargadas[playlistActual] = true;
-        localStorage.hgDescargasV2 = JSON.stringify(descargadas);
-
-        btn.innerHTML = SVG_CHECK;
-        btn.classList.add("activo");
+        verificarEstadoDescargaPlaylist();
         btn.style.pointerEvents = "auto";
         
     } catch (error) {
@@ -2159,17 +2131,44 @@ async function descargarPlaylistActiva() {
     }
 }
 
-function revisarSiEstaDescargada() {
-    let descargadas = JSON.parse(localStorage.hgDescargasV2 || "{}");
+async function verificarEstadoDescargaPlaylist() {
+    if (!playlistActual || !playlists[playlistActual]) return;
     const btn = $("plDescargarBtn");
-    if (btn) {
-        if (descargadas[playlistActual]) {
+    if (!btn) return;
+
+    let cancionesPlaylist = playlists[playlistActual];
+    if (cancionesPlaylist.length === 0) {
+        btn.innerHTML = SVG_DOWN;
+        btn.classList.remove("activo");
+        return;
+    }
+
+    try {
+        const cache = await caches.open('hg-music-v3');
+        let todasDescargadas = true;
+
+        for (let idx of cancionesPlaylist) {
+            let c = canciones[idx];
+            if (c) {
+                let matchAudio = await cache.match(c.archivo);
+                let matchPortada = await cache.match(c.portada);
+                if (!matchAudio || !matchPortada) {
+                    todasDescargadas = false;
+                    break;
+                }
+            }
+        }
+
+        if (todasDescargadas) {
             btn.innerHTML = SVG_CHECK;
             btn.classList.add("activo");
         } else {
             btn.innerHTML = SVG_DOWN;
             btn.classList.remove("activo");
         }
+    } catch (e) {
+        btn.innerHTML = SVG_DOWN;
+        btn.classList.remove("activo");
     }
 }
 
