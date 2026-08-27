@@ -174,18 +174,37 @@
     .nav-btn.activo{color:#fff} 
     
     .playlist-header-top { display:flex; align-items:center; gap:10px; margin-bottom:15px; }
-    .playlist-header-top input { flex:1; padding:10px 15px; border-radius:8px; border:none; background:#ffffff1a; color:#fff; font-size:14px; }
+    .playlist-header-top input { flex:1; padding:12px 15px; border-radius:12px; border:none; background:#ffffff1a; color:#fff; font-size:14px; outline:none; }
     .playlist-collage { width:220px; height:220px; margin:0 auto 15px; box-shadow:0 10px 40px #0008; background:#282828; }
     .collage-4 { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; height:100%; }
     .collage-1 { display:block; height:100%; width:100%; }
     .collage-4 img, .collage-1 img { width:100%; height:100%; object-fit:cover; }
     
-    .play-blue { width:56px; height:56px; border-radius:50%; background:#008cff; color:#fff; display:flex; align-items:center; justify-content:center; font-size:24px; border:none; margin-left:auto; cursor:pointer; box-shadow:0 8px 20px rgba(0, 140, 255, 0.4); transition:0.2s; }
-    .play-blue.reproduciendo { background:#1ed760; box-shadow:0 8px 22px rgba(30, 215, 96, 0.6); }
     .playlist-action-bar { display:flex; align-items:center; gap:20px; margin:20px 0; }
-    .p-icon { color:#b3b3b3; font-size:24px; cursor:pointer; transition:0.2s; display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,0.06); }
+    
+    .p-icon { 
+        display:inline-flex; align-items:center; justify-content:center; 
+        width:46px; height:46px; border-radius:50%; 
+        background:rgba(255,255,255,0.06); color:#b3b3b3; 
+        cursor:pointer; transition:0.2s; 
+    }
+    .p-icon svg { width:20px; height:20px; }
     .p-icon:hover { color:#fff; background:rgba(255,255,255,0.15); }
     .p-icon.activo { color:#fff; background:var(--c); box-shadow:0 0 15px var(--c); }
+    
+    .play-blue { 
+        width:58px; height:58px; border-radius:50%; 
+        background:#008cff; color:#fff; 
+        display:flex; align-items:center; justify-content:center; 
+        border:none; margin-left:auto; cursor:pointer; 
+        box-shadow:0 8px 20px rgba(0, 140, 255, 0.4); transition:0.2s; 
+    }
+    .play-blue svg { width:28px; height:28px; margin-left:4px; } 
+    .play-blue.reproduciendo { background:#1ed760; box-shadow:0 8px 22px rgba(30, 215, 96, 0.6); }
+    .play-blue.reproduciendo svg { margin-left:0; } 
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .spin-anim { animation: spin 1s linear infinite; }
     
     .modal{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;padding:20px;background:#000a;backdrop-filter:blur(8px);z-index:8000;opacity:0;visibility:hidden;transition:.2s} 
     .modal.abierto{opacity:1;visibility:visible} 
@@ -304,7 +323,8 @@
     <div id="vistaDetallePlaylist" class="vista">
         <div class="playlist-header-top">
             <button class="volver" onclick="volverAnterior()">←</button>
-            <input type="text" placeholder="Buscar en la playlist">
+            <!-- AQUÍ ESTÁ EL INPUT FUNCIONAL DE BÚSQUEDA DE PLAYLIST -->
+            <input type="text" id="inputBuscarPlaylist" placeholder="Buscar en la playlist" oninput="filtrarCancionesPlaylist()">
         </div>
         
         <div style="text-align:center; margin-top:10px;">
@@ -318,12 +338,18 @@
         </div>
         
         <div class="playlist-action-bar">
-            <span id="plAleatorioBtn" class="p-icon" onclick="alternarAleatorio()" title="Modo Aleatorio">🔀</span>
-            <!-- NUEVO BOTÓN DE DESCARGA -->
-            <span id="plDescargarBtn" class="p-icon" onclick="descargarPlaylistActiva()" title="Descargar Playlist para escuchar sin internet">⬇️</span>
+            <span id="plAleatorioBtn" class="p-icon" onclick="alternarAleatorio()" title="Modo Aleatorio">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+            </span>
+            
+            <span id="plDescargarBtn" class="p-icon" onclick="descargarPlaylistActiva()" title="Descargar Playlist para escuchar sin internet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            </span>
             
             <div style="flex:1;"></div>
-            <button id="plPlayBtn" class="play-blue" onclick="toggleReproducirPlaylistActiva()">▶</button>
+            <button id="plPlayBtn" class="play-blue" onclick="toggleReproducirPlaylistActiva()">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            </button>
         </div>
         
         <div id="plCanciones"></div>
@@ -400,6 +426,12 @@
     </div>
 
 <script>
+const SVG_PLAY = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`;
+const SVG_PAUSE = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+const SVG_DOWN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`;
+const SVG_CHECK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+const SVG_LOAD = `<svg class="spin-anim" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>`;
+
 const canciones = [
 {archivo:"https://res.cloudinary.com/ghq37xg9/video/upload/v1787420012/qdum85iqmjhfasxvshhn.mp3",portada:"https://res.cloudinary.com/ghq37xg9/image/upload/v1787420001/ahzl7v3ixp9hf8xyyx0x.jpg",nombre:"FANATICO",artista:"BLESSD J ALVAREZ"},
 {archivo:"https://res.cloudinary.com/ghq37xg9/video/upload/v1787434898/guixgooslaluzeb07mt1.mp3",portada:"https://res.cloudinary.com/ghq37xg9/image/upload/v1787434895/copeppcqzfkxem20zdem.jpg",nombre:"SORNERO",artista:"BLESSD"},
@@ -1318,7 +1350,7 @@ function actualizarEstadoBotonesUI(){
     const plPlayBtn = $("plPlayBtn");
     if(plPlayBtn) {
         let estaSonandoPlaylistActual = !reproductorActivo.paused && playlistActual && playlists[playlistActual] && playlists[playlistActual].includes(indice);
-        plPlayBtn.textContent = estaSonandoPlaylistActual ? "⏸" : "▶";
+        plPlayBtn.innerHTML = estaSonandoPlaylistActual ? SVG_PAUSE : SVG_PLAY;
         plPlayBtn.classList.toggle("reproduciendo", estaSonandoPlaylistActual);
     }
 }
@@ -1648,9 +1680,13 @@ function abrirDetallePlaylist(nombre) {
     window.scrollTo({top:0,behavior:"smooth"});
 
     $("plNombre").textContent = nombre;
-    revisarSiEstaDescargada(); // <--- Llama a verificar si la playlist está descargada
+    $("inputBuscarPlaylist").value = ""; // Limpiar buscador interno al entrar
+    revisarSiEstaDescargada(); 
     
-    let songs = playlists[nombre] || [];
+    renderizarCancionesPlaylist(playlists[nombre] || []);
+}
+
+function renderizarCancionesPlaylist(songs) {
     $("plStats").textContent = `${songs.length} canciones`;
 
     let covers = [...new Set(songs.map(n => canciones[n]?.portada).filter(Boolean))];
@@ -1666,9 +1702,9 @@ function abrirDetallePlaylist(nombre) {
 
     $("plCanciones").innerHTML = "";
     if (songs.length === 0) {
-        $("plCanciones").innerHTML = '<div class="vacio">Playlist vacía. Busca canciones y presiona ➕ para añadirlas.</div>';
+        $("plCanciones").innerHTML = '<div class="vacio">No hay canciones que coincidan o la playlist está vacía.</div>';
     } else {
-        songs.forEach((n, idx) => { 
+        songs.forEach((n) => { 
             if (canciones[n]) {
                 let c = canciones[n];
                 let div = document.createElement("div");
@@ -1679,19 +1715,15 @@ function abrirDetallePlaylist(nombre) {
                         <div class="nombre">${c.nombre}</div>
                         <div class="artista-lista">${c.artista}</div>
                     </div>
-                    <div style="display:flex; flex-direction:column; gap:8px; margin-right:12px;">
-                        <button class="btn-orden" onclick="event.stopPropagation(); moverArriba('${nombre}', ${idx})" title="Mover arriba">🔼</button>
-                        <button class="btn-orden" onclick="event.stopPropagation(); moverAbajo('${nombre}', ${idx})" title="Mover abajo">🔽</button>
-                    </div>
-                    <button class="add-btn" onclick="event.stopPropagation(); removerDePlaylist('${nombre}', ${idx})" title="Quitar de playlist">❌</button>
+                    <button class="add-btn" onclick="event.stopPropagation(); removerDePlaylistActiva(${n})" title="Quitar de playlist">❌</button>
                 `;
                 div.onclick = () => { 
-                    playlistActual = nombre;
-                    let arr = [...playlists[nombre]];
-                    let aReproducir = arr[idx];
-                    cola = arr.filter((_, i) => i !== idx); 
+                    playlistActual = playlistActual;
+                    let arr = [...playlists[playlistActual]];
+                    let realIdx = arr.indexOf(n);
+                    cola = arr.filter((_, i) => i !== realIdx); 
                     guardar();
-                    cambiar(aReproducir);
+                    cambiar(n);
                 };
                 $("plCanciones").appendChild(div);
             } 
@@ -1700,21 +1732,35 @@ function abrirDetallePlaylist(nombre) {
     actualizarEstadoBotonesUI();
 }
 
-function moverArriba(nombre, idx) {
-    if (idx === 0) return;
-    let arr = playlists[nombre];
-    let temp = arr[idx - 1]; arr[idx - 1] = arr[idx]; arr[idx] = temp;
-    guardarPlaylists(); abrirDetallePlaylist(nombre);
+// NUEVA FUNCIÓN PARA FILTRAR EN TIEMPO REAL DENTRO DE LA PLAYLIST
+function filtrarCancionesPlaylist() {
+    if (!playlistActual || !playlists[playlistActual]) return;
+    let texto = $("inputBuscarPlaylist").value.toLowerCase().trim();
+    let listaOriginal = playlists[playlistActual];
+
+    if (!texto) {
+        renderizarCancionesPlaylist(listaOriginal);
+        return;
+    }
+
+    let filtradas = listaOriginal.filter(n => {
+        let c = canciones[n];
+        if (!c) return false;
+        return c.nombre.toLowerCase().includes(texto) || c.artista.toLowerCase().includes(texto);
+    });
+
+    renderizarCancionesPlaylist(filtradas);
 }
-function moverAbajo(nombre, idx) {
-    let arr = playlists[nombre];
-    if (idx === arr.length - 1) return;
-    let temp = arr[idx + 1]; arr[idx + 1] = arr[idx]; arr[idx] = temp;
-    guardarPlaylists(); abrirDetallePlaylist(nombre);
-}
-function removerDePlaylist(nombre, idx) {
-    playlists[nombre].splice(idx, 1);
-    guardarPlaylists(); abrirDetallePlaylist(nombre); mostrarBibliotecaPlaylists();
+
+function removerDePlaylistActiva(n) {
+    let arr = playlists[playlistActual];
+    let idx = arr.indexOf(n);
+    if(idx > -1) {
+        arr.splice(idx, 1);
+        guardarPlaylists();
+        filtrarCancionesPlaylist(); // Actualiza la vista manteniendo el filtro actual si lo hubiera
+        mostrarBibliotecaPlaylists();
+    }
 }
 
 function toggleReproducirPlaylistActiva() {
@@ -1814,9 +1860,6 @@ function crearHome(){
     }); 
 } 
 
-// ==========================================
-// NUEVAS FUNCIONES: DESCARGAR PLAYLIST
-// ==========================================
 async function descargarPlaylistActiva() {
     if (!playlistActual || !playlists[playlistActual] || playlists[playlistActual].length === 0) {
         alert("No hay canciones en esta playlist para descargar.");
@@ -1825,29 +1868,24 @@ async function descargarPlaylistActiva() {
 
     const btn = $("plDescargarBtn");
     
-    // Si ya está descargada, no hacemos nada
     if (btn.classList.contains("activo")) {
         alert("✅ Esta playlist ya está guardada en tu dispositivo.");
         return;
     }
 
-    let confirmacion = confirm("¿Quieres descargar todas las canciones de esta playlist para escucharlas sin internet? (Puede tardar unos segundos dependiendo de tu conexión).");
+    let confirmacion = confirm("¿Quieres descargar todas las canciones de esta playlist para escucharlas sin internet?");
     if (!confirmacion) return;
 
-    // Cambiar diseño del botón a "Cargando"
-    btn.textContent = "⏳";
+    btn.innerHTML = SVG_LOAD;
     btn.style.pointerEvents = "none";
 
     try {
-        // Abrimos la misma memoria (Caché) que usa tu sw.js
         const cache = await caches.open('hg-music-v3'); 
         
-        // Buscamos todas las canciones de esta playlist
         let promesas = playlists[playlistActual].map(async (idx) => {
             let c = canciones[idx];
             if (c) {
                 try {
-                    // Guardamos el audio y la portada en la memoria del celular
                     let resAudio = await fetch(c.archivo);
                     if(resAudio.ok) await cache.put(c.archivo, resAudio.clone());
                     
@@ -1859,25 +1897,21 @@ async function descargarPlaylistActiva() {
             }
         });
 
-        // Esperamos a que se descarguen TODAS
         await Promise.all(promesas);
 
-        // Guardamos en el historial del celular que esta playlist ya está descargada
         let descargadas = JSON.parse(localStorage.hgDescargasV2 || "{}");
         descargadas[playlistActual] = true;
         localStorage.hgDescargasV2 = JSON.stringify(descargadas);
 
-        // Cambiamos el botón a éxito
-        btn.textContent = "✅";
+        btn.innerHTML = SVG_CHECK;
         btn.classList.add("activo");
         btn.style.pointerEvents = "auto";
         
-        alert("🎉 ¡Descarga completada! Ya puedes apagar tu internet y escuchar tu playlist.");
     } catch (error) {
         console.error(error);
-        btn.textContent = "⬇️";
+        btn.innerHTML = SVG_DOWN;
         btn.style.pointerEvents = "auto";
-        alert("❌ Hubo un error al descargar. Intenta de nuevo con mejor conexión.");
+        alert("❌ Hubo un error al descargar. Intenta de nuevo.");
     }
 }
 
@@ -1886,15 +1920,14 @@ function revisarSiEstaDescargada() {
     const btn = $("plDescargarBtn");
     if (btn) {
         if (descargadas[playlistActual]) {
-            btn.textContent = "✅";
+            btn.innerHTML = SVG_CHECK;
             btn.classList.add("activo");
         } else {
-            btn.textContent = "⬇️";
+            btn.innerHTML = SVG_DOWN;
             btn.classList.remove("activo");
         }
     }
 }
-// ==========================================
 
 crearHome(); 
 mostrarBiblioteca(); 
