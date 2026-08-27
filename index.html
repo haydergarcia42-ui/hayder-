@@ -125,10 +125,21 @@
     .barra{height:7px;margin-top:22px;background:#ffffff25;border-radius:20px;overflow:hidden;cursor:pointer;touch-action:none} 
     .progreso{width:0;height:100%;background:var(--c);box-shadow:0 0 10px var(--c),0 0 20px var(--c)} 
     .tiempo{display:flex;justify-content:space-between;margin-top:7px;color:#888;font-size:11px} 
+    
     .controles{display:flex;justify-content:center;align-items:center;gap:35px;margin-top:17px} 
-    .boton,.play{border:0;display:flex;align-items:center;justify-content:center} 
-    .boton{width:54px;height:54px;border-radius:50%;background:#ffffff12;color:#fff;font-size:23px} 
-    .play{width:68px;height:68px;border-radius:50%;color:#000;font-size:27px;background:var(--c);box-shadow:0 0 30px var(--c)} 
+    .boton{border:0;display:flex;align-items:center;justify-content:center; width:54px;height:54px;border-radius:50%;background:#ffffff12;color:#fff;font-size:23px;} 
+    
+    /* ESTILO UNIFICADO PARA EL BOTÓN PRINCIPAL DE REPRODUCCIÓN (IGUAL AL DE PLAYLISTS) */
+    .play-blue { 
+        width:58px; height:58px; border-radius:50%; 
+        background:var(--c); color:#fff; 
+        display:flex; align-items:center; justify-content:center; 
+        border:none; cursor:pointer; 
+        box-shadow:0 8px 20px rgba(0, 140, 255, 0.4); transition:0.2s; 
+    }
+    .play-blue svg { width:26px; height:26px; margin-left:3px; } 
+    .play-blue.reproduciendo svg { margin-left:0; width:24px; height:24px; } 
+
     .extra-controles{display:flex;justify-content:center;gap:7px;margin-top:14px;flex-wrap:wrap} 
     .extra{border:0;padding:8px 11px;border-radius:12px;background:#ffffff12;color:#fff;font-size:11px; transition:0.2s;} 
     .extra.activo{background:var(--c);color:#000; font-weight:bold; box-shadow:0 0 12px var(--c);} 
@@ -148,7 +159,8 @@
     .mini-info{flex:1;min-width:0} 
     .mini-info b,.mini-info small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} 
     .mini-info small{color:#888;margin-top:3px} 
-    .mini-play{border:0;background:var(--c);color:#000;width:42px;height:42px;border-radius:50%;font-size:17px} 
+    .mini-play{border:0;background:var(--c);color:#fff;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;} 
+    .mini-play svg{width:20px;height:20px;margin-left:2px;}
     
     .panel{margin-bottom:22px} 
     .panel h2{font-size:20px;margin:0 0 13px} 
@@ -165,9 +177,6 @@
     .fav{border:0;background:none;color:#aaa;font-size:21px;padding:5px} 
     .fav.activo{color:#1ed760} 
     
-    .btn-orden { border:0; background:none; color:#aaa; font-size:16px; padding:2px 5px; cursor:pointer; }
-    .btn-orden:hover { color:#fff; }
-    
     .navegacion{position:fixed;left:0;right:0;bottom:0;height:64px;z-index:4500;background:#080808f5;border-top:1px solid #ffffff12;backdrop-filter:blur(20px);display:flex;justify-content:space-evenly;align-items:center} 
     .nav-btn{border:0;background:none;color:#777;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;min-width:65px} 
     .nav-btn span{font-size:23px} 
@@ -180,28 +189,17 @@
     .collage-1 { display:block; height:100%; width:100%; }
     .collage-4 img, .collage-1 img { width:100%; height:100%; object-fit:cover; }
     
-    .playlist-action-bar { display:flex; align-items:center; gap:20px; margin:20px 0; }
+    .playlist-action-bar { display:flex; align-items:center; gap:15px; margin:20px 0; }
     
     .p-icon { 
         display:inline-flex; align-items:center; justify-content:center; 
-        width:46px; height:46px; border-radius:50%; 
-        background:rgba(255,255,255,0.06); color:#b3b3b3; 
-        cursor:pointer; transition:0.2s; 
+        width:48px; height:48px; border-radius:50%; 
+        background:rgba(255,255,255,0.08); color:#ccc; 
+        cursor:pointer; transition:0.2s; border:none;
     }
-    .p-icon svg { width:20px; height:20px; }
+    .p-icon svg { width:22px; height:22px; }
     .p-icon:hover { color:#fff; background:rgba(255,255,255,0.15); }
-    .p-icon.activo { color:#fff; background:var(--c); box-shadow:0 0 15px var(--c); }
-    
-    .play-blue { 
-        width:58px; height:58px; border-radius:50%; 
-        background:#008cff; color:#fff; 
-        display:flex; align-items:center; justify-content:center; 
-        border:none; margin-left:auto; cursor:pointer; 
-        box-shadow:0 8px 20px rgba(0, 140, 255, 0.4); transition:0.2s; 
-    }
-    .play-blue svg { width:28px; height:28px; margin-left:4px; } 
-    .play-blue.reproduciendo { background:#1ed760; box-shadow:0 8px 22px rgba(30, 215, 96, 0.6); }
-    .play-blue.reproduciendo svg { margin-left:0; } 
+    .p-icon.activo { color:#000; background:var(--c); box-shadow:0 0 15px var(--c); font-weight:bold; }
 
     @keyframes spin { 100% { transform: rotate(360deg); } }
     .spin-anim { animation: spin 1s linear infinite; }
@@ -323,7 +321,6 @@
     <div id="vistaDetallePlaylist" class="vista">
         <div class="playlist-header-top">
             <button class="volver" onclick="volverAnterior()">←</button>
-            <!-- AQUÍ ESTÁ EL INPUT FUNCIONAL DE BÚSQUEDA DE PLAYLIST -->
             <input type="text" id="inputBuscarPlaylist" placeholder="Buscar en la playlist" oninput="filtrarCancionesPlaylist()">
         </div>
         
@@ -338,15 +335,19 @@
         </div>
         
         <div class="playlist-action-bar">
-            <span id="plAleatorioBtn" class="p-icon" onclick="alternarAleatorio()" title="Modo Aleatorio">
+            <!-- BOTÓN ALEATORIO UNIFICADO CON LOS DEMÁS -->
+            <button id="plAleatorioBtn" class="p-icon" onclick="alternarAleatorio()" title="Modo Aleatorio">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
-            </span>
+            </button>
             
-            <span id="plDescargarBtn" class="p-icon" onclick="descargarPlaylistActiva()" title="Descargar Playlist para escuchar sin internet">
+            <!-- BOTÓN DESCARGAR UNIFICADO CON LOS DEMÁS -->
+            <button id="plDescargarBtn" class="p-icon" onclick="descargarPlaylistActiva()" title="Descargar Playlist">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            </span>
+            </button>
             
             <div style="flex:1;"></div>
+            
+            <!-- BOTÓN PLAY PRINCIPAL -->
             <button id="plPlayBtn" class="play-blue" onclick="toggleReproducirPlaylistActiva()">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             </button>
@@ -372,7 +373,10 @@
             
             <div class="controles">
                 <button class="boton" onclick="anterior()">⏮</button>
-                <button id="play" class="play" onclick="reproducir()">▶</button>
+                <!-- BOTÓN PRINCIPAL DE REPRODUCCIÓN EN EL REPRODUCTOR CAMBIADO AL ESTILO MODERNO -->
+                <button id="play" class="play-blue" onclick="reproducir()">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                </button>
                 <button class="boton" onclick="siguiente()">⏭</button>
             </div>
             
@@ -392,7 +396,9 @@
             <b id="miniTitulo">Sin canciones</b>
             <small id="miniArtista">...</small>
         </div>
-        <button id="miniPlay" class="mini-play" onclick="event.stopPropagation(); reproducir()">▶</button>
+        <button id="miniPlay" class="mini-play" onclick="event.stopPropagation(); reproducir()">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
     </div>
 
     <!-- BARRA DE NAVEGACIÓN -->
@@ -1271,10 +1277,31 @@ function actualizarMediaSession() {
             ]
         });
 
-        navigator.mediaSession.setActionHandler('play', function() { reproducir(); });
-        navigator.mediaSession.setActionHandler('pause', function() { reproducir(); });
-        navigator.mediaSession.setActionHandler('previoustrack', function() { anterior(); });
-        navigator.mediaSession.setActionHandler('nexttrack', function() { siguiente(); });
+        navigator.mediaSession.setActionHandler('play', function() { 
+            if(reproductorActivo.paused) reproducir(); 
+        });
+        
+        navigator.mediaSession.setActionHandler('pause', function() { 
+            if(!reproductorActivo.paused) reproducir(); 
+        });
+        
+        navigator.mediaSession.setActionHandler('previoustrack', function() { 
+            anterior(); 
+        });
+        
+        navigator.mediaSession.setActionHandler('nexttrack', function() { 
+            siguiente(); 
+        });
+
+        if ('setPositionState' in navigator.mediaSession) {
+            try {
+                navigator.mediaSession.setPositionState({
+                    duration: reproductorActivo.duration || 0,
+                    playbackRate: reproductorActivo.playbackRate,
+                    position: reproductorActivo.currentTime || 0
+                });
+            } catch (e) {}
+        }
     }
 }
 
@@ -1347,9 +1374,22 @@ function actualizarEstadoBotonesUI(){
     if(contPortada) contPortada.classList.toggle("sin-giro", !giroPortada);
     if(btnGirar) btnGirar.classList.toggle("activo", giroPortada);
 
+    let estaSonando = !reproductorActivo.paused;
+
+    const playMainBtn = $("play");
+    if(playMainBtn) {
+        playMainBtn.innerHTML = estaSonando ? SVG_PAUSE : SVG_PLAY;
+        playMainBtn.classList.toggle("reproduciendo", estaSonando);
+    }
+
+    const miniPlayBtn = $("miniPlay");
+    if(miniPlayBtn) {
+        miniPlayBtn.innerHTML = estaSonando ? SVG_PAUSE : SVG_PLAY;
+    }
+
     const plPlayBtn = $("plPlayBtn");
     if(plPlayBtn) {
-        let estaSonandoPlaylistActual = !reproductorActivo.paused && playlistActual && playlists[playlistActual] && playlists[playlistActual].includes(indice);
+        let estaSonandoPlaylistActual = estaSonando && playlistActual && playlists[playlistActual] && playlists[playlistActual].includes(indice);
         plPlayBtn.innerHTML = estaSonandoPlaylistActual ? SVG_PAUSE : SVG_PLAY;
         plPlayBtn.classList.toggle("reproduciendo", estaSonandoPlaylistActual);
     }
@@ -1414,7 +1454,6 @@ function reproducir(){
     aud.onplay = function() { 
         if (this !== reproductorActivo) return; 
         if (!canciones[indice]) return; 
-        $("play").textContent = $("miniPlay").textContent = "⏸"; 
         $("estado").textContent = "▶ Reproduciendo"; 
         $("reproductor").classList.add("reproduciendo"); 
         $("mini").classList.add("visible"); 
@@ -1431,11 +1470,11 @@ function reproducir(){
         historial = [indice,...historial.filter(x=>x!==indice)].slice(0,10); 
         guardar(); mostrarBiblioteca(); 
         actualizarEstadoBotonesUI();
+        actualizarMediaSession();
     }; 
     
     aud.onpause = function() { 
         if (this !== reproductorActivo) return;
-        $("play").textContent = $("miniPlay").textContent = "▶"; 
         $("estado").textContent = "⏸ Pausado"; 
         $("reproductor").classList.remove("reproduciendo"); 
         actualizarEstadoBotonesUI();
@@ -1463,6 +1502,7 @@ function reproducir(){
     aud.onloadedmetadata = function() { 
         if (this !== reproductorActivo) return;
         $("duracion").textContent = tiempo(this.duration); 
+        actualizarMediaSession();
     };
 });
 
@@ -1680,7 +1720,7 @@ function abrirDetallePlaylist(nombre) {
     window.scrollTo({top:0,behavior:"smooth"});
 
     $("plNombre").textContent = nombre;
-    $("inputBuscarPlaylist").value = ""; // Limpiar buscador interno al entrar
+    $("inputBuscarPlaylist").value = ""; 
     revisarSiEstaDescargada(); 
     
     renderizarCancionesPlaylist(playlists[nombre] || []);
@@ -1732,7 +1772,6 @@ function renderizarCancionesPlaylist(songs) {
     actualizarEstadoBotonesUI();
 }
 
-// NUEVA FUNCIÓN PARA FILTRAR EN TIEMPO REAL DENTRO DE LA PLAYLIST
 function filtrarCancionesPlaylist() {
     if (!playlistActual || !playlists[playlistActual]) return;
     let texto = $("inputBuscarPlaylist").value.toLowerCase().trim();
@@ -1758,7 +1797,7 @@ function removerDePlaylistActiva(n) {
     if(idx > -1) {
         arr.splice(idx, 1);
         guardarPlaylists();
-        filtrarCancionesPlaylist(); // Actualiza la vista manteniendo el filtro actual si lo hubiera
+        filtrarCancionesPlaylist(); 
         mostrarBibliotecaPlaylists();
     }
 }
@@ -1931,7 +1970,7 @@ function revisarSiEstaDescargada() {
 
 crearHome(); 
 mostrarBiblioteca(); 
-cargar(0); 
+if(canciones.length > 0) cargar(0); 
 actualizarEstadoBotonesUI();
 actualizarMediaSession(); 
 
