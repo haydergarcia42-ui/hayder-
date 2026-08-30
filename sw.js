@@ -19,33 +19,6 @@ self.addEventListener('activate', event => {
     );
 });
 
-// Reconstruye una respuesta parcial (206) a partir de una respuesta completa
-// guardada en caché, respetando el encabezado "Range" que pide el <audio>.
-async function respuestaConRango(request, cachedResponse) {
-    const rangeHeader = request.headers.get('range');
-    if (!rangeHeader) return cachedResponse;
-
-    const buffer = await cachedResponse.clone().arrayBuffer();
-    const totalLength = buffer.byteLength;
-    const match = /bytes=(\d+)-(\d*)/.exec(rangeHeader);
-    if (!match) return cachedResponse;
-
-    const start = parseInt(match[1], 10);
-    const end = match[2] ? parseInt(match[2], 10) : totalLength - 1;
-    const slice = buffer.slice(start, end + 1);
-
-    return new Response(slice, {
-        status: 206,
-        statusText: 'Partial Content',
-        headers: {
-            'Content-Type': cachedResponse.headers.get('Content-Type') || 'application/octet-stream',
-            'Content-Range': `bytes ${start}-${end}/${totalLength}`,
-            'Content-Length': slice.byteLength,
-            'Accept-Ranges': 'bytes'
-        }
-    });
-}
-
 self.addEventListener('fetch', event => {
     const request = event.request;
 
@@ -68,13 +41,14 @@ self.addEventListener('fetch', event => {
     }
 
     // Para audio, portadas y demás archivos descargados: CACHÉ PRIMERO.
-    // Así, si ya está guardado, se reproduce al instante sin esperar
-    // a que falle un intento de red (eso es lo que causaba el corte
-    // al pasar de canción sin conexión).
+    // Se devuelve el archivo cacheado tal cual (sin tocar sus bytes),
+    // porque si viene de otro dominio (Google Drive, Dropbox, etc.)
+    // el navegador no deja que el service worker lea su contenido,
+    // y cualquier intento de "recortarlo" produce silencio.
     event.respondWith(
         caches.match(request).then(cachedResponse => {
             if (cachedResponse) {
-                return respuestaConRango(request, cachedResponse);
+                return cachedResponse;
             }
             return fetch(request)
                 .then(networkResponse => {
